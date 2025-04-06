@@ -20,4 +20,3 @@ jwt:
     signerKey: "Ot9t5aGxoRKLti29eTn9MhuIcBitnGrs7w7N0+CXpk7BUHbK/ZVA97p17967gPG3"
     valid-duration: 3600 # in second -> token will expire after 3600 seconds
     refreshable-duration: 360000 # in second -> token will be able to be refreshed in 360000 seconds
-                                 
