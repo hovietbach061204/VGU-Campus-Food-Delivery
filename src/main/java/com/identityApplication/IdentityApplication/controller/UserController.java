@@ -35,13 +35,13 @@ public class UserController {
     // data from user. In order to map data to object, we use @RequestBody
 
     @PostMapping // -> because we already had @RequestMapping("/users")
-    public APIResponse <User> createUser(@RequestBody @Valid UserCreationRequest request){
+    public APIResponse <UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
         // annotation @Valid indicates the framework that the object of type UserCreationRequest
         // has to be validated based on the rule that has been set in UserCreationRequest
         log.info("Controller: Create User"); // debug unit test
-        APIResponse<User> apiResponse = new APIResponse<>();
-        apiResponse.setResult(userService.createUser(request));
-        return apiResponse;
+        return APIResponse.<UserResponse>builder()
+                .result(userService.createUser(request))
+                .build();
     }
 
     @GetMapping // get all users

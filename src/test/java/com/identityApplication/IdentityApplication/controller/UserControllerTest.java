@@ -1,14 +1,12 @@
 package com.identityApplication.IdentityApplication.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.identityApplication.IdentityApplication.dto.request.UserCreationRequest;
 import com.identityApplication.IdentityApplication.dto.response.UserResponse;
-import com.identityApplication.IdentityApplication.entity.User;
 import com.identityApplication.IdentityApplication.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -17,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -28,10 +27,11 @@ import java.time.LocalDate;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest // init spring boot framework, dbms, bin,...
 @Slf4j
-@AutoConfigureMockMvc // create mock request to our controller
-public class UserControllerTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+@TestPropertySource("/test.properties") // for Isolation in Unit Test -> Unit Test can run anywhere, on any environments, not depend on third parties
+class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,41 +41,38 @@ public class UserControllerTest {
 
     private UserCreationRequest request;
     private UserResponse userResponse;
-    private User user;
-    private LocalDate dob;;
+    private LocalDate dob;
 
-
-    @BeforeEach // -> this will run first of all other methods
-    void initData(){
+    @BeforeEach
+    void initData() {
         dob = LocalDate.of(1990, 1, 1);
 
         request = UserCreationRequest.builder()
-                .username("kleverbrokeboi")
-                .firstname("Bach")
-                .lastname("Ho")
+                .username("john")
+                .firstname("John")
+                .lastname("Doe")
                 .password("12345678")
                 .dob(dob)
                 .build();
 
         userResponse = UserResponse.builder()
-                .id("edfbd4616039")
-                .username("kleverbrokeboi")
-                .firstname("Bach")
-                .lastname("Ho")
+                .id("cf0600f538b3")
+                .username("john")
+                .firstname("John")
+                .lastname("Doe")
                 .dob(dob)
                 .build();
     }
 
-
     @Test
+        //
     void createUser_validRequest_success() throws Exception {
         // GIVEN
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         String content = objectMapper.writeValueAsString(request);
 
-        Mockito.when(userService.createUser(ArgumentMatchers.any()))
-                .thenReturn(user);
+        Mockito.when(userService.createUser(ArgumentMatchers.any())).thenReturn(userResponse);
 
         // WHEN, THEN
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
@@ -85,8 +82,6 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("code").value(1000))
                 .andExpect(MockMvcResultMatchers.jsonPath("result.id").value("cf0600f538b3"));
     }
-
-
 
     @Test
         //

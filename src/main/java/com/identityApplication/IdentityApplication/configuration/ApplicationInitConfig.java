@@ -33,10 +33,14 @@ public class ApplicationInitConfig {
     static final String ADMIN_PASSWORD = "admin";
 
     @Bean
-    @ConditionalOnProperty(
+    @ConditionalOnProperty( // this means @Bean will be init once the value: spring.datasource.driverClassName = com.mysql.cj.jdbc.Driver
             prefix = "spring",
             value = "datasource.driverClassName",
             havingValue = "com.mysql.cj.jdbc.Driver")
+    // Set condition to decide to init the @Bean or not. Here we set if it run the application
+    // uses the mySQL database, it initializes the @Bean, if it runs test -> uses h2 database
+    // it does not initialize h2 database (the reason is although the h2 database conform
+    // to the SQL regulations but not completely it will cause error with our query below)
     ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
         log.info("Initializing application.....");
         return args -> {
