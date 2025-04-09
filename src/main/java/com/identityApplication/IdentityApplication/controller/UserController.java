@@ -25,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+
 public class UserController {
 
     //@Autowired
@@ -37,6 +38,7 @@ public class UserController {
     public APIResponse <User> createUser(@RequestBody @Valid UserCreationRequest request){
         // annotation @Valid indicates the framework that the object of type UserCreationRequest
         // has to be validated based on the rule that has been set in UserCreationRequest
+        log.info("Controller: Create User"); // debug unit test
         APIResponse<User> apiResponse = new APIResponse<>();
         apiResponse.setResult(userService.createUser(request));
         return apiResponse;

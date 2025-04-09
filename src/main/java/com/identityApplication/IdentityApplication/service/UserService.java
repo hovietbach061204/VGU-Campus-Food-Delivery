@@ -48,7 +48,7 @@ public class UserService {
     RoleRepository roleRepository;
 
     public User createUser(UserCreationRequest request){
-
+        log.info("Service: Create User");
         if(userRepository.existsByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USER_EXISTED); // if the new user is created with
         // the name that already exists in database, it will cause this error
