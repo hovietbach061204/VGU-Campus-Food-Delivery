@@ -8,11 +8,6 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import com.identityApplication.IdentityApplication.dto.request.UserCreationRequest;
-import com.identityApplication.IdentityApplication.dto.response.UserResponse;
-import com.identityApplication.IdentityApplication.entity.User;
-import com.identityApplication.IdentityApplication.exception.AppException;
-import com.identityApplication.IdentityApplication.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +16,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import com.identityApplication.IdentityApplication.dto.request.UserCreationRequest;
+import com.identityApplication.IdentityApplication.dto.response.UserResponse;
+import com.identityApplication.IdentityApplication.entity.User;
+import com.identityApplication.IdentityApplication.exception.AppException;
+import com.identityApplication.IdentityApplication.repository.UserRepository;
 
 @SpringBootTest
 @TestPropertySource("/test.properties") // for Isolation in Unit Test

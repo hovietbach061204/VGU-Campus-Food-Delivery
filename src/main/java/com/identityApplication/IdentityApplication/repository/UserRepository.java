@@ -1,10 +1,11 @@
 package com.identityApplication.IdentityApplication.repository;
 
-import com.identityApplication.IdentityApplication.entity.User;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.identityApplication.IdentityApplication.entity.User;
 
 // declare the repository and indicate the entity to work with is User
 // and its id's (primary key) type is String

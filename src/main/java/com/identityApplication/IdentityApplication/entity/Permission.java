@@ -2,6 +2,7 @@ package com.identityApplication.IdentityApplication.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @Entity
 public class Permission {
     @Id
-     String name;
-     String description;
+    String name;
+
+    String description;
 }

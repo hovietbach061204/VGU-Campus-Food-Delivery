@@ -1,17 +1,16 @@
 package com.identityApplication.IdentityApplication.dto.request;
 
-import com.identityApplication.IdentityApplication.validator.DobConstraint;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.Size;
+
+import com.identityApplication.IdentityApplication.validator.DobConstraint;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDate;
-
-//@Getter // lombok will automatically generate the public getter for variables
-//@Setter
+// @Getter // lombok will automatically generate the public getter for variables
+// @Setter
 @Data // lombok will automatically generate the public getter, setter, construct, ToString, HarshCode,... for variables
 @NoArgsConstructor // create constructor with no required parameters
 @AllArgsConstructor // create constructor requires all below variables as parameters
@@ -26,9 +25,10 @@ public class UserCreationRequest {
     // ErrorCode.USERNAME_INVALID.getMessage() -> it does not accept this
     private String username;
 
-    @Size(min = 6, message = "PASSWORD_INVALID")// indicates that the length of password when user creates new account
+    @Size(min = 6, message = "PASSWORD_INVALID") // indicates that the length of password when user creates new account
     // has to be min equal to 8. message will pop up when the user violates this rule.
     String password;
+
     String firstname;
     String lastname;
     // some more annotations: @NotNull, @NotBlank,...
@@ -38,4 +38,3 @@ public class UserCreationRequest {
     @DobConstraint(min = 18, message = "INVALID_DOB")
     LocalDate dob;
 }
-

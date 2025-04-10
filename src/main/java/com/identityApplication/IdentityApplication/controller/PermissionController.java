@@ -1,18 +1,18 @@
 package com.identityApplication.IdentityApplication.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.*;
 
 import com.identityApplication.IdentityApplication.dto.request.APIResponse;
 import com.identityApplication.IdentityApplication.dto.request.PermissionRequest;
 import com.identityApplication.IdentityApplication.dto.response.PermissionResponse;
 import com.identityApplication.IdentityApplication.service.PermissionService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/permissions")

@@ -17,33 +17,35 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity // authorizing on method
-
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = {"/users", "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh"};
+    private final String[] PUBLIC_ENDPOINTS = {
+        "/users", "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh"
+    };
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
 
-//    @Value("${jwt.signerKey}")
-//    private String signerKey;
+    //    @Value("${jwt.signerKey}")
+    //    private String signerKey;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         // Use authorizeHttpRequests to config the detail of requests. Using requestMatchers
-        // to determine endpoints. In this case, the POST for endpoints "users", "auth/token", "auth/introspect" are allowed for all
+        // to determine endpoints. In this case, the POST for endpoints "users", "auth/token", "auth/introspect" are
+        // allowed for all
         // clients, any other requests, need authentication.
-        httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll() // -> allow every user
+        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                .permitAll() // -> allow every user
 
-                        // authorizing on endpoint
-                        //.requestMatchers(HttpMethod.GET, "/users")
-                        //.hasRole(Role.ADMIN.name()) // hasRole(Role.ADMIN.name()) = hasAuthority(ROLE_ADMIN)
+                // authorizing on endpoint
+                // .requestMatchers(HttpMethod.GET, "/users")
+                // .hasRole(Role.ADMIN.name()) // hasRole(Role.ADMIN.name()) = hasAuthority(ROLE_ADMIN)
 
-                        .anyRequest().authenticated()); // need authentication
+                .anyRequest()
+                .authenticated()); // need authentication
 
-        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(
-                jwtConfigurer -> jwtConfigurer
+        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .authenticationEntryPoint(new JwTAuthenticationEntryPoint()));
@@ -55,10 +57,9 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-
     // Convert (customize the claim) from SCOPE -> ROLE
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter(){
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
@@ -67,17 +68,17 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-//    @Bean
-//    JwtDecoder jwtDecoder(){
-//        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
-//        return NimbusJwtDecoder
-//                .withSecretKey(secretKeySpec)
-//                .macAlgorithm(MacAlgorithm.HS512)
-//                .build();
-//    }
+    //    @Bean
+    //    JwtDecoder jwtDecoder(){
+    //        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
+    //        return NimbusJwtDecoder
+    //                .withSecretKey(secretKeySpec)
+    //                .macAlgorithm(MacAlgorithm.HS512)
+    //                .build();
+    //    }
 
     @Bean
-    PasswordEncoder passwordEncoder(){
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
 }

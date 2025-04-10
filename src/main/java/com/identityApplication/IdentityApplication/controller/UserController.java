@@ -2,22 +2,23 @@ package com.identityApplication.IdentityApplication.controller;
 // I switched to sub1 branch
 // That's amazing to use git in the real project
 
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
 import com.identityApplication.IdentityApplication.dto.request.APIResponse;
 import com.identityApplication.IdentityApplication.dto.request.UserCreationRequest;
 import com.identityApplication.IdentityApplication.dto.request.UserUpdateRequest;
 import com.identityApplication.IdentityApplication.dto.response.UserResponse;
-import com.identityApplication.IdentityApplication.entity.User;
 import com.identityApplication.IdentityApplication.service.UserService;
-import jakarta.validation.Valid;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/users") // because we will use the api /users frequently so we
@@ -25,17 +26,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
-
 public class UserController {
 
-    //@Autowired
+    // @Autowired
     UserService userService;
 
-    //@PostMapping("/users") // each endpoint (I mean this api) will receive
+    // @PostMapping("/users") // each endpoint (I mean this api) will receive
     // data from user. In order to map data to object, we use @RequestBody
 
     @PostMapping // -> because we already had @RequestMapping("/users")
-    public APIResponse <UserResponse> createUser(@RequestBody @Valid UserCreationRequest request){
+    public APIResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         // annotation @Valid indicates the framework that the object of type UserCreationRequest
         // has to be validated based on the rule that has been set in UserCreationRequest
         log.info("Controller: Create User"); // debug unit test
@@ -55,29 +55,28 @@ public class UserController {
                 .build();
     }
 
-//    @GetMapping("/{userId}")
-//    // in order to map the param "userId" to a variable
-//    // we use @PathVariable
-//    public UserResponse getUser(@PathVariable("userId") String userId){
-//        return userService.getUser(userId);
-//    }
+    //    @GetMapping("/{userId}")
+    //    // in order to map the param "userId" to a variable
+    //    // we use @PathVariable
+    //    public UserResponse getUser(@PathVariable("userId") String userId){
+    //        return userService.getUser(userId);
+    //    }
 
     // in order to map the param "userId" to a variable
     // we use @PathVariable
     @GetMapping("/{userId}")
-    APIResponse<UserResponse> getUser(@PathVariable("userId") String userId){
+    APIResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
         return APIResponse.<UserResponse>builder()
                 .result(userService.getUser(userId))
                 .build();
     }
 
     @GetMapping("/myinfo")
-    APIResponse<UserResponse> getMyInfo(){
+    APIResponse<UserResponse> getMyInfo() {
         return APIResponse.<UserResponse>builder()
                 .result(userService.getMyInfo())
                 .build();
     }
-
 
     @PutMapping("/{userId}")
     APIResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {

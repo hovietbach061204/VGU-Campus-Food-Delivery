@@ -194,10 +194,19 @@
 						</indent>
 						<palantirJavaFormat/>
 						<importOrder>
+							<!-- Specify either order or file, but not both -->
 							<order>java,jakarta,org,com,com.diffplug,</order>
 						</importOrder>
 					</java>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

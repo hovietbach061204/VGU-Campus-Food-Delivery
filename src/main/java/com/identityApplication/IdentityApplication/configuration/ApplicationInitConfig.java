@@ -1,22 +1,24 @@
 package com.identityApplication.IdentityApplication.configuration;
 
-import com.identityApplication.IdentityApplication.constant.PredefinedRole;
-import com.identityApplication.IdentityApplication.entity.Role;
-import com.identityApplication.IdentityApplication.entity.User;
-import com.identityApplication.IdentityApplication.repository.RoleRepository;
-import com.identityApplication.IdentityApplication.repository.UserRepository;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashSet;
+
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.HashSet;
+import com.identityApplication.IdentityApplication.constant.PredefinedRole;
+import com.identityApplication.IdentityApplication.entity.Role;
+import com.identityApplication.IdentityApplication.entity.User;
+import com.identityApplication.IdentityApplication.repository.RoleRepository;
+import com.identityApplication.IdentityApplication.repository.UserRepository;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @RequiredArgsConstructor
@@ -33,7 +35,8 @@ public class ApplicationInitConfig {
     static final String ADMIN_PASSWORD = "admin";
 
     @Bean
-    @ConditionalOnProperty( // this means @Bean will be init once the value: spring.datasource.driverClassName = com.mysql.cj.jdbc.Driver
+    @ConditionalOnProperty( // this means @Bean will be init once the value: spring.datasource.driverClassName =
+            // com.mysql.cj.jdbc.Driver
             prefix = "spring",
             value = "datasource.driverClassName",
             havingValue = "com.mysql.cj.jdbc.Driver")

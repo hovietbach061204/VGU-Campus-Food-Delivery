@@ -1,12 +1,13 @@
 package com.identityApplication.IdentityApplication.entity;
 
+import java.util.Set;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Data
 @Builder
@@ -16,16 +17,17 @@ import java.util.Set;
 @Entity
 public class Role {
     @Id
-     String name;
-     String description;
+    String name;
 
-     @ManyToMany
-     Set<Permission> permissions; // role contains many permissions
+    String description;
+
+    @ManyToMany
+    Set<Permission> permissions; // role contains many permissions
 }
 
 /*
 User -> many Role
-        Role -> many Permission
+		Role -> many Permission
 
- => Many to many in JPA
+=> Many to many in JPA
  */
