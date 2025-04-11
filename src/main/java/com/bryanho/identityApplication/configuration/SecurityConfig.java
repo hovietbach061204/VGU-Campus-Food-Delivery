@@ -1,5 +1,7 @@
 package com.bryanho.identityApplication.configuration;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -22,29 +25,39 @@ public class SecurityConfig {
         "/users", "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh"
     };
 
-
     private final CustomJwtDecoder customJwtDecoder;
 
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
         this.customJwtDecoder = customJwtDecoder;
     }
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        // Use authorizeHttpRequests to config the detail of requests. Using requestMatchers
-        // to determine endpoints. In this case, the POST for endpoints "users", "auth/token", "auth/introspect" are
+        // Use authorizeHttpRequests to config the detail of requests. Using
+        // requestMatchers
+        // to determine endpoints. In this case, the POST for endpoints "users",
+        // "auth/token", "auth/introspect" are
         // allowed for all
         // clients, any other requests, need authentication.
-        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
-                .permitAll() // -> allow every user
+        httpSecurity
+                .cors(cors -> cors.configurationSource(request -> {
+                    var corsConfig = new CorsConfiguration();
+                    corsConfig.setAllowedOrigins(List.of("http://localhost:3000"));
+                    corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    corsConfig.setAllowedHeaders(List.of("*"));
+                    corsConfig.setAllowCredentials(true);
+                    return corsConfig;
+                }))
+                .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                        .permitAll() // -> allow every user
 
-                // authorizing on endpoint
-                // .requestMatchers(HttpMethod.GET, "/users")
-                // .hasRole(Role.ADMIN.name()) // hasRole(Role.ADMIN.name()) = hasAuthority(ROLE_ADMIN)
+                        // authorizing on endpoint
+                        // .requestMatchers(HttpMethod.GET, "/users")
+                        // .hasRole(Role.ADMIN.name()) // hasRole(Role.ADMIN.name()) =
+                        // hasAuthority(ROLE_ADMIN)
 
-                .anyRequest()
-                .authenticated()); // need authentication
+                        .anyRequest()
+                        .authenticated()); // need authentication
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(customJwtDecoder)
@@ -68,7 +81,6 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
-
 
     @Bean
     PasswordEncoder passwordEncoder() {
