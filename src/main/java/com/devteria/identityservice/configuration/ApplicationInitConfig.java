@@ -1,5 +1,6 @@
 package com.devteria.identityservice.configuration;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 
 import org.springframework.boot.ApplicationRunner;
@@ -58,6 +59,9 @@ public class ApplicationInitConfig {
 
                 User user = User.builder()
                         .username(ADMIN_USER_NAME)
+                        .firstName(ADMIN_USER_NAME)
+                        .lastName(ADMIN_USER_NAME)
+                        .dob(LocalDate.parse("2000-01-01"))
                         .password(passwordEncoder.encode(ADMIN_PASSWORD))
                         .roles(roles)
                         .build();

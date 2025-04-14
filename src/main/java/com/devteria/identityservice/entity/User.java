@@ -3,6 +3,7 @@ package com.devteria.identityservice.entity;
 import java.time.LocalDate;
 import java.util.Set;
 
+import com.devteria.identityservice.status.Status;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -27,7 +28,20 @@ public class User {
     String firstName;
     LocalDate dob;
     String lastName;
+    private Status status;
 
     @ManyToMany
     Set<Role> roles;
+
+    @OneToMany(mappedBy = "user")
+    Set<Order> orders;
+
+//    @OneToMany(mappedBy = "user")
+//    Set<Notification> notifications;
+
+
+//    @OneToMany(mappedBy = "user")
+//    Set<ChatRoom> chatboxes;
+//    @OneToOne(mappedBy = "user")
+//    Message message;
 }
