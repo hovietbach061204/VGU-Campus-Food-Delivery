@@ -28,13 +28,13 @@ public class User {
     String firstName;
     LocalDate dob;
     String lastName;
-    private Status status;
+    Status status;
 
     @ManyToMany
     Set<Role> roles;
 
-    @OneToMany(mappedBy = "user")
-    Set<Order> orders;
+//    @OneToMany(mappedBy = "user")
+//    Set<Order> orders;
 
 //    @OneToMany(mappedBy = "user")
 //    Set<Notification> notifications;
