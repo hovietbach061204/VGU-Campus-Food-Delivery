@@ -3,6 +3,7 @@ package com.devteria.identityservice.dto.response;
 import java.time.LocalDate;
 import java.util.Set;
 
+import com.devteria.identityservice.status.Status;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,4 +19,5 @@ public class UserResponse {
     String lastName;
     LocalDate dob;
     Set<RoleResponse> roles;
+    Status status;
 }

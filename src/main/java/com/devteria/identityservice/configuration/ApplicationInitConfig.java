@@ -3,6 +3,7 @@ package com.devteria.identityservice.configuration;
 import java.time.LocalDate;
 import java.util.HashSet;
 
+import com.devteria.identityservice.status.Status;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,9 @@ public class ApplicationInitConfig {
 
     @NonFinal
     static final String ADMIN_USER_NAME = "admin";
+
+    @NonFinal
+    static final Status OFFLINE = Status.OFFLINE;
 
     @NonFinal
     static final String ADMIN_PASSWORD = "admin";
@@ -62,6 +66,7 @@ public class ApplicationInitConfig {
                         .firstName(ADMIN_USER_NAME)
                         .lastName(ADMIN_USER_NAME)
                         .dob(LocalDate.parse("2000-01-01"))
+                        .status(OFFLINE)
                         .password(passwordEncoder.encode(ADMIN_PASSWORD))
                         .roles(roles)
                         .build();

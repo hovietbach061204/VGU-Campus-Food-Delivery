@@ -28,6 +28,8 @@ public class User {
     String firstName;
     LocalDate dob;
     String lastName;
+
+    @Enumerated(EnumType.STRING)
     Status status;
 
     @ManyToMany
