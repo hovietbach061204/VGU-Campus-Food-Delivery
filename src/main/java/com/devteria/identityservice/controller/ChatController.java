@@ -3,6 +3,8 @@ package com.devteria.identityservice.controller;
 import com.devteria.identityservice.entity.ChatMessage;
 import com.devteria.identityservice.entity.ChatNotification;
 import com.devteria.identityservice.service.ChatMessageService;
+import com.devteria.identityservice.service.UserService;
+import com.devteria.identityservice.status.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -20,10 +22,16 @@ public class ChatController {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageService chatMessageService;
+    private final UserService userService; // Inject UserService
 
     @MessageMapping("/chat")
     public void processMessage(@Payload ChatMessage chatMessage) {
+        // Update the sender's status to ONLINE
+        userService.updateUserStatus(chatMessage.getSenderId(), Status.ONLINE);
+
+        // Save the chat message
         ChatMessage savedMsg = chatMessageService.save(chatMessage);
+        // Send a notification to the recipient
         messagingTemplate.convertAndSendToUser(
                 chatMessage.getRecipientId(), "/queue/messages",
                 new ChatNotification(

@@ -95,6 +95,14 @@ public class UserService {
                 userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
 
+    public void updateUserStatus(String username, Status status) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setStatus(status);
+        userRepository.save(user);
+    }
+
+
     public void saveUser(User user) {
         user.setStatus(Status.ONLINE);
         userRepository.save(user);
