@@ -13,9 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.bryanho.identityApplication.dto.request.UserCreationRequest;
 import com.bryanho.identityApplication.dto.response.UserResponse;
@@ -29,7 +29,7 @@ public class UserServiceTest {
     @Autowired
     private UserService userService;
 
-    @MockitoBean
+    @MockBean
     private UserRepository userRepository;
 
     private UserCreationRequest request;

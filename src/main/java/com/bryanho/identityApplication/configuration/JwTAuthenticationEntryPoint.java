@@ -10,9 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.bryanho.identityApplication.dto.request.APIResponse;
 import com.bryanho.identityApplication.exception.ErrorCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JwTAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
