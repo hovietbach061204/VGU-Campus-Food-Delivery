@@ -23,8 +23,8 @@ public class User {
 
     @Column(name = "username", unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String username;
-
     String password;
+
     String firstName;
     LocalDate dob;
     String lastName;
@@ -35,7 +35,7 @@ public class User {
     @ManyToMany
     Set<Role> roles;
 
-//    @OneToMany(mappedBy = "user")
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    Set<Order> orders;
 
 //    @OneToMany(mappedBy = "user")

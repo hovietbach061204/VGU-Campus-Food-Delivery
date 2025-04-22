@@ -15,13 +15,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 public class Discount {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String discountId;
+    //@GeneratedValue(strategy = GenerationType.UUID)
+    //String discountId;
 
+    @Id
     @Column(name = "voucherCode", length = 255)
     String voucherCode;
-
     int discountPercentage;
     LocalDate expiryDate;
 }

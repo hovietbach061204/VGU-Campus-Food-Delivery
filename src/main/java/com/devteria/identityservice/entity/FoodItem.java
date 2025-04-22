@@ -15,11 +15,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 public class FoodItem {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.UUID)
+//    String foodItemId;
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String fooItemId;
-
     String name;
+
     String description;
 
     @Column(name = "price", precision = 10, scale = 2)
