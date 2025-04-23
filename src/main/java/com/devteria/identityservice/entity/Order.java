@@ -22,12 +22,15 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     String orderId;
 
-//    @GeneratedValue(strategy = GenerationType.UUID)
-//    String purchaserId;
-//
-//    @GeneratedValue(strategy = GenerationType.UUID)
-//    String deliverymanId;
+    @ManyToOne
+    @JoinColumn(name = "purchaser_id", referencedColumnName = "id", nullable = false)
+    User purchaser;
 
+    @ManyToOne
+    @JoinColumn(name = "deliveryman_id", referencedColumnName = "id", nullable = true)
+    User deliveryman;
+
+    @Enumerated(EnumType.STRING)
     OrderStatus orderStatus;
 
     @Column(name = "totalPrice", precision = 10, scale = 2)

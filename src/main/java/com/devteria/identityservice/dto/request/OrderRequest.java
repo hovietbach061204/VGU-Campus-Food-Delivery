@@ -15,7 +15,7 @@ import java.util.Set;
 public class OrderRequest {
     Set<String> voucherCode;
     String eateryName;
-    List<String> foodItems;
+    Set<FoodItemOrderRequest> foodItems;
     String purchaserId;
     String deliverymanId;
 }

@@ -21,4 +21,6 @@ public class OrderResponse {
     EateryOrderResponse eateryOrderResponse;
     OrderStatus orderStatus;
     BigDecimal totalPrice;
+    UserOrderResponse purchaserResponse; // New field for purchaser
+    UserOrderResponse deliverymanResponse; // New field for deliveryman
 }

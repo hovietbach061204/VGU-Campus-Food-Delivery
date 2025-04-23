@@ -15,7 +15,11 @@ public interface OrderMapper {
     @Mapping(target = "deliveryman", ignore = true)
     Order toOrder(OrderRequest orderRequest);
 
+    @Mapping(target = "foodItemResponses", source = "foodItems")
+    @Mapping(target = "discountResponses", source = "discounts")
+    @Mapping(target = "eateryOrderResponse", source = "eatery")
     @Mapping(target = "purchaserResponse", source = "purchaser")
     @Mapping(target = "deliverymanResponse", source = "deliveryman")
+    @Mapping(target = "createdAt", source = "createdAt")
     OrderResponse toOrderResponse(Order order);
 }

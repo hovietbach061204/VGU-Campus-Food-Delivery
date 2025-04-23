@@ -28,6 +28,4 @@ public class FoodItem {
 
     @Column(name = "imageUrl")
     String imageUrl;
-
-    int quantity;
 }
