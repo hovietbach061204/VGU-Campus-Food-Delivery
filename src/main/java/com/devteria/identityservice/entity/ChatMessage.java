@@ -1,12 +1,11 @@
 package com.devteria.identityservice.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -18,6 +17,7 @@ import java.util.Date;
 public class ChatMessage {
     @Id
     private String id;
+
     private String chatId;
     private String senderId;
     private String recipientId;

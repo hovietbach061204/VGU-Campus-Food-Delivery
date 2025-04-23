@@ -1,11 +1,7 @@
 package com.devteria.identityservice.controller;
 
-import com.devteria.identityservice.entity.ChatMessage;
-import com.devteria.identityservice.entity.ChatNotification;
-import com.devteria.identityservice.service.ChatMessageService;
-import com.devteria.identityservice.service.UserService;
-import com.devteria.identityservice.status.Status;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -14,7 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.List;
+import com.devteria.identityservice.entity.ChatMessage;
+import com.devteria.identityservice.entity.ChatNotification;
+import com.devteria.identityservice.service.ChatMessageService;
+import com.devteria.identityservice.service.UserService;
+import com.devteria.identityservice.status.Status;
+
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
@@ -33,20 +35,15 @@ public class ChatController {
         ChatMessage savedMsg = chatMessageService.save(chatMessage);
         // Send a notification to the recipient
         messagingTemplate.convertAndSendToUser(
-                chatMessage.getRecipientId(), "/queue/messages",
+                chatMessage.getRecipientId(),
+                "/queue/messages",
                 new ChatNotification(
-                        savedMsg.getId(),
-                        savedMsg.getSenderId(),
-                        savedMsg.getRecipientId(),
-                        savedMsg.getContent()
-                )
-        );
+                        savedMsg.getId(), savedMsg.getSenderId(), savedMsg.getRecipientId(), savedMsg.getContent()));
     }
 
     @GetMapping("/messages/{senderId}/{recipientId}")
-    public ResponseEntity<List<ChatMessage>> findChatMessages(@PathVariable String senderId,
-                                                              @PathVariable String recipientId) {
-        return ResponseEntity
-                .ok(chatMessageService.findChatMessages(senderId, recipientId));
+    public ResponseEntity<List<ChatMessage>> findChatMessages(
+            @PathVariable String senderId, @PathVariable String recipientId) {
+        return ResponseEntity.ok(chatMessageService.findChatMessages(senderId, recipientId));
     }
 }

@@ -1,12 +1,14 @@
 package com.devteria.identityservice.service;
 
-import com.devteria.identityservice.entity.ChatMessage;
-import com.devteria.identityservice.repository.ChatMessageRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.devteria.identityservice.entity.ChatMessage;
+import com.devteria.identityservice.repository.ChatMessageRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

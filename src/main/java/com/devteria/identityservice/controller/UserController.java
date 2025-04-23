@@ -2,7 +2,6 @@ package com.devteria.identityservice.controller;
 
 import java.util.List;
 
-import com.devteria.identityservice.entity.User;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -15,6 +14,7 @@ import com.devteria.identityservice.dto.request.ApiResponse;
 import com.devteria.identityservice.dto.request.UserCreationRequest;
 import com.devteria.identityservice.dto.request.UserUpdateRequest;
 import com.devteria.identityservice.dto.response.UserResponse;
+import com.devteria.identityservice.entity.User;
 import com.devteria.identityservice.service.UserService;
 
 import lombok.AccessLevel;
@@ -73,18 +73,14 @@ public class UserController {
 
     @MessageMapping("/user.addUser")
     @SendTo("/user/public")
-    public User addUser(
-            @Payload User user
-    ) {
+    public User addUser(@Payload User user) {
         userService.saveUser(user);
         return user;
     }
 
     @MessageMapping("/user.disconnectUser")
     @SendTo("/user/public")
-    public User disconnectUser(
-            @Payload User user
-    ) {
+    public User disconnectUser(@Payload User user) {
         userService.disconnect(user);
         return user;
     }

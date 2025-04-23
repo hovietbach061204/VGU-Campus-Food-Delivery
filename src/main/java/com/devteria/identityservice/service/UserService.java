@@ -3,7 +3,6 @@ package com.devteria.identityservice.service;
 import java.util.HashSet;
 import java.util.List;
 
-import com.devteria.identityservice.status.Status;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +21,7 @@ import com.devteria.identityservice.exception.ErrorCode;
 import com.devteria.identityservice.mapper.UserMapper;
 import com.devteria.identityservice.repository.RoleRepository;
 import com.devteria.identityservice.repository.UserRepository;
+import com.devteria.identityservice.status.Status;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -96,12 +96,11 @@ public class UserService {
     }
 
     public void updateUserStatus(String username, Status status) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user =
+                userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         user.setStatus(status);
         userRepository.save(user);
     }
-
 
     public void saveUser(User user) {
         user.setStatus(Status.ONLINE);

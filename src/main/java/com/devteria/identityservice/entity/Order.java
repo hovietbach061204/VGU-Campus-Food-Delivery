@@ -1,12 +1,13 @@
 package com.devteria.identityservice.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
+
+import jakarta.persistence.*;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -43,10 +44,9 @@ public class Order {
     @JoinColumn(name = "userId")
     User user;
 
-//    @OneToOne(mappedBy = "order")
-//    ChatRoom chatRoom;
+    //    @OneToOne(mappedBy = "order")
+    //    ChatRoom chatRoom;
 
     @ManyToMany
     Set<Eatery> eateries;
-
 }

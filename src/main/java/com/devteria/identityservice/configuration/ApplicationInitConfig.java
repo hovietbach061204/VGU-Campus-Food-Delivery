@@ -3,7 +3,6 @@ package com.devteria.identityservice.configuration;
 import java.time.LocalDate;
 import java.util.HashSet;
 
-import com.devteria.identityservice.status.Status;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +14,7 @@ import com.devteria.identityservice.entity.Role;
 import com.devteria.identityservice.entity.User;
 import com.devteria.identityservice.repository.RoleRepository;
 import com.devteria.identityservice.repository.UserRepository;
+import com.devteria.identityservice.status.Status;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

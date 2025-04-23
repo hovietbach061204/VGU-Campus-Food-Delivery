@@ -3,8 +3,9 @@ package com.devteria.identityservice.entity;
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.devteria.identityservice.status.Status;
 import jakarta.persistence.*;
+
+import com.devteria.identityservice.status.Status;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -35,15 +36,14 @@ public class User {
     @ManyToMany
     Set<Role> roles;
 
-//    @OneToMany(mappedBy = "user")
-//    Set<Order> orders;
+    //    @OneToMany(mappedBy = "user")
+    //    Set<Order> orders;
 
-//    @OneToMany(mappedBy = "user")
-//    Set<Notification> notifications;
+    //    @OneToMany(mappedBy = "user")
+    //    Set<Notification> notifications;
 
-
-//    @OneToMany(mappedBy = "user")
-//    Set<ChatRoom> chatboxes;
-//    @OneToOne(mappedBy = "user")
-//    Message message;
+    //    @OneToMany(mappedBy = "user")
+    //    Set<ChatRoom> chatboxes;
+    //    @OneToOne(mappedBy = "user")
+    //    Message message;
 }

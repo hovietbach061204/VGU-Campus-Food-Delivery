@@ -22,11 +22,11 @@ public class Message {
     String text;
     LocalDate timestamp;
 
-//    @ManyToOne
-//    @JoinColumn(name = "chatId")
-//    ChatRoom chatRoom;
-//
-//    @OneToOne
-//    @JoinColumn(name = "senderId", unique = true) // Ensures one-to-one relationship
-//    User user;
+    //    @ManyToOne
+    //    @JoinColumn(name = "chatId")
+    //    ChatRoom chatRoom;
+    //
+    //    @OneToOne
+    //    @JoinColumn(name = "senderId", unique = true) // Ensures one-to-one relationship
+    //    User user;
 }
