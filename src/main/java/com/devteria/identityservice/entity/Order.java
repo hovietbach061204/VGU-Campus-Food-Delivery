@@ -6,6 +6,8 @@ import java.util.Set;
 
 import jakarta.persistence.*;
 
+import com.devteria.identityservice.status.OrderStatus;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -22,31 +24,34 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     String orderId;
 
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String purchaserId;
+    //    @GeneratedValue(strategy = GenerationType.UUID)
+    //    String purchaserId;
+    //
+    //    @GeneratedValue(strategy = GenerationType.UUID)
+    //    String deliverymanId;
 
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String deliverymanId;
-
-    @GeneratedValue(strategy = GenerationType.UUID)
-    int statusId;
+    OrderStatus orderStatus;
 
     @Column(name = "totalPrice", precision = 10, scale = 2)
     BigDecimal totalPrice;
 
-    @GeneratedValue(strategy = GenerationType.UUID)
-    int discountId;
-
     LocalDate createdAt;
     LocalDate updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    User user;
+    //    @ManyToOne
+    //    @JoinColumn(name = "userId")
+    //    User user;
 
     //    @OneToOne(mappedBy = "order")
     //    ChatRoom chatRoom;
 
+    @ManyToOne
+    @JoinColumn(name = "eatery_name", referencedColumnName = "name", nullable = false)
+    Eatery eatery;
+
     @ManyToMany
-    Set<Eatery> eateries;
+    Set<FoodItem> foodItems;
+
+    @ManyToMany
+    Set<Discount> discounts;
 }

@@ -15,10 +15,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 public class Eatery {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String eateryId;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.UUID)
+//    String eateryId;
 
+    @Id
     String name;
 
     @Column(name = "location")
@@ -29,4 +30,7 @@ public class Eatery {
 
     @ManyToMany
     Set<FoodItem> foodItems;
+
+    @OneToMany(mappedBy = "eatery", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Order> orders;
 }

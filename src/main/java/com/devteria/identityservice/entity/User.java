@@ -26,6 +26,7 @@ public class User {
     String username;
 
     String password;
+
     String firstName;
     LocalDate dob;
     String lastName;
@@ -36,7 +37,7 @@ public class User {
     @ManyToMany
     Set<Role> roles;
 
-    //    @OneToMany(mappedBy = "user")
+    //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     //    Set<Order> orders;
 
     //    @OneToMany(mappedBy = "user")
