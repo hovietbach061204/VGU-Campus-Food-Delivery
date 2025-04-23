@@ -1,9 +1,9 @@
 package com.devteria.identityservice.dto.request;
 
+import java.util.Set;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -14,5 +14,5 @@ public class EateryRequest {
     String name;
     String location;
     String contactNumber;
-    Set<String> foodItems; //Menu
+    Set<String> foodItems; // Menu
 }

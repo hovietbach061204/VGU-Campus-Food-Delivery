@@ -19,15 +19,13 @@ public class FirestoreSyncService {
 
             Map<String, Object> data = new HashMap<>();
             data.put("order_id", order.getOrderId());
-            data.put("purchaser_id", order.getPurchaserId());
+            // data.put("purchaser_id", order.getPurchaserId());
             // data.put("delivery_man_id", order.getDeliveryManId()); // may be null
-            data.put("status_id", order.getStatusId());
+            // data.put("status_id", order.getStatusId());
             data.put("total_price", order.getTotalPrice());
             data.put("created_at", Timestamp.now());
 
-            db.collection("orders")
-              .document(order.getOrderId().toString())
-              .set(data);
+            db.collection("orders").document(order.getOrderId().toString()).set(data);
 
             System.out.println("✅ Order pushed to Firestore: ");
         } catch (Exception e) {

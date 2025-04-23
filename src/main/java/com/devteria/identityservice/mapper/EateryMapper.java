@@ -1,13 +1,16 @@
 package com.devteria.identityservice.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
 import com.devteria.identityservice.dto.request.EateryRequest;
 import com.devteria.identityservice.dto.response.EateryMenuResponse;
 import com.devteria.identityservice.dto.response.EateryOrderResponse;
 import com.devteria.identityservice.entity.Eatery;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {FoodItemMapper.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {FoodItemMapper.class})
 public interface EateryMapper {
 
     @Mapping(target = "foodItems", ignore = true)

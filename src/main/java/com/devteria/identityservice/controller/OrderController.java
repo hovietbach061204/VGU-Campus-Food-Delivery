@@ -1,18 +1,19 @@
 package com.devteria.identityservice.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.devteria.identityservice.dto.request.ApiResponse;
 import com.devteria.identityservice.dto.request.OrderRequest;
 import com.devteria.identityservice.dto.response.OrderResponse;
-import com.devteria.identityservice.dto.response.RoleResponse;
-import com.devteria.identityservice.dto.response.UserResponse;
 import com.devteria.identityservice.service.OrderService;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
@@ -23,27 +24,39 @@ public class OrderController {
     final OrderService orderService;
 
     @PostMapping
-    ApiResponse<OrderResponse> createOrder(@RequestBody OrderRequest request){
+    ApiResponse<OrderResponse> createOrder(@RequestBody OrderRequest request) {
         return ApiResponse.<OrderResponse>builder()
                 .result(orderService.createOrder(request))
                 .build();
     }
 
+    @PostMapping("/{orderId}/accept")
+    public ResponseEntity<?> acceptOrder(
+        @PathVariable Integer orderId,
+        @RequestParam Integer driverId
+    ) {
+        boolean accepted = orderMatchingService.acceptOrder(driverId, orderId);
+        if (accepted) {
+            return ResponseEntity.ok(Map.of("status", "ACCEPTED"));
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("status", "ALREADY_ASSIGNED"));
+        }
+    }
 
     @GetMapping
-    ApiResponse<List<OrderResponse>>getAllOrders() {
+    ApiResponse<List<OrderResponse>> getAllOrders() {
         return ApiResponse.<List<OrderResponse>>builder()
                 .result(orderService.getAllOrders())
                 .build();
     }
 
     @GetMapping("/{orderId}")
-    ApiResponse<OrderResponse>getOrder(@PathVariable String orderId) {
+    ApiResponse<OrderResponse> getOrder(@PathVariable String orderId) {
         return ApiResponse.<OrderResponse>builder()
                 .result(orderService.getOrder(orderId))
                 .build();
     }
-
 
     @DeleteMapping("/{orderId}")
     ApiResponse<Void> delete(@PathVariable String orderId) {

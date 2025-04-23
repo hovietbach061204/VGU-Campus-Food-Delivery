@@ -1,15 +1,15 @@
 package com.devteria.identityservice.controller;
 
-import com.devteria.identityservice.dto.request.ApiResponse;
-import com.devteria.identityservice.dto.request.EateryRequest;
-import com.devteria.identityservice.dto.response.DiscountResponse;
-import com.devteria.identityservice.dto.response.EateryMenuResponse;
-import com.devteria.identityservice.dto.response.EateryOrderResponse;
-import com.devteria.identityservice.service.EateryService;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.devteria.identityservice.dto.request.ApiResponse;
+import com.devteria.identityservice.dto.request.EateryRequest;
+import com.devteria.identityservice.dto.response.EateryMenuResponse;
+import com.devteria.identityservice.service.EateryService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/eateries")
@@ -24,7 +24,6 @@ public class EateryController {
                 .build();
     }
 
-
     @GetMapping
     ApiResponse<List<EateryMenuResponse>> getAllEateries() {
         return ApiResponse.<List<EateryMenuResponse>>builder()
@@ -33,12 +32,11 @@ public class EateryController {
     }
 
     @GetMapping("/{eateryName}")
-    ApiResponse<EateryMenuResponse>  getEatery(@PathVariable String eateryName) {
+    ApiResponse<EateryMenuResponse> getEatery(@PathVariable String eateryName) {
         return ApiResponse.<EateryMenuResponse>builder()
                 .result(eateryService.getEatery(eateryName))
                 .build();
     }
-
 
     @DeleteMapping("/{eateryName}")
     ApiResponse<Void> deleteEatery(@PathVariable String eateryName) {

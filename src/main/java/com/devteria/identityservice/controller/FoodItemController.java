@@ -1,14 +1,15 @@
 package com.devteria.identityservice.controller;
 
-import com.devteria.identityservice.dto.request.ApiResponse;
-import com.devteria.identityservice.dto.request.FoodItemRequest;
-import com.devteria.identityservice.dto.response.DiscountResponse;
-import com.devteria.identityservice.dto.response.FoodItemMenuResponse;
-import com.devteria.identityservice.service.FoodItemService;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.devteria.identityservice.dto.request.ApiResponse;
+import com.devteria.identityservice.dto.request.FoodItemRequest;
+import com.devteria.identityservice.dto.response.FoodItemMenuResponse;
+import com.devteria.identityservice.service.FoodItemService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/food-items")
@@ -24,7 +25,7 @@ public class FoodItemController {
     }
 
     @GetMapping
-    ApiResponse<List<FoodItemMenuResponse> >getAllFoodItems() {
+    ApiResponse<List<FoodItemMenuResponse>> getAllFoodItems() {
         return ApiResponse.<List<FoodItemMenuResponse>>builder()
                 .result(foodItemService.getAllFoodItems())
                 .build();

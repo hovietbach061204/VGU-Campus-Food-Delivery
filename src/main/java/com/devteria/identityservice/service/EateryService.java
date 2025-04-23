@@ -1,17 +1,17 @@
 package com.devteria.identityservice.service;
 
+import java.util.HashSet;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.devteria.identityservice.dto.request.EateryRequest;
 import com.devteria.identityservice.dto.response.EateryMenuResponse;
-import com.devteria.identityservice.dto.response.EateryOrderResponse;
-import com.devteria.identityservice.entity.Eatery;
 import com.devteria.identityservice.mapper.EateryMapper;
 import com.devteria.identityservice.repository.EateryRepository;
 import com.devteria.identityservice.repository.FoodItemRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,8 @@ public class EateryService {
     }
 
     public EateryMenuResponse getEatery(String eateryName) {
-        return eateryRepository.findById(eateryName)
+        return eateryRepository
+                .findById(eateryName)
                 .map(eateryMapper::toEateryMenuResponse)
                 .orElseThrow(() -> new RuntimeException("Eatery not found"));
     }

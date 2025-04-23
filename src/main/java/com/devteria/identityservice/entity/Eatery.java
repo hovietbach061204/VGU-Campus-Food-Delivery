@@ -15,9 +15,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 public class Eatery {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.UUID)
-//    String eateryId;
+    //    @Id
+    //    @GeneratedValue(strategy = GenerationType.UUID)
+    //    String eateryId;
 
     @Id
     String name;

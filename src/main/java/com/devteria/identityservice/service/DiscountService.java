@@ -1,18 +1,19 @@
 package com.devteria.identityservice.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.devteria.identityservice.dto.request.DiscountRequest;
-import com.devteria.identityservice.dto.response.DiscountOrderResponse;
 import com.devteria.identityservice.dto.response.DiscountResponse;
 import com.devteria.identityservice.entity.Discount;
 import com.devteria.identityservice.mapper.DiscountMapper;
 import com.devteria.identityservice.repository.DiscountRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,8 @@ public class DiscountService {
     }
 
     public DiscountResponse getDiscount(String discountId) {
-        return discountRepository.findById(discountId)
+        return discountRepository
+                .findById(discountId)
                 .map(discountMapper::toDiscountResponse)
                 .orElseThrow(() -> new RuntimeException("Discount not found"));
     }

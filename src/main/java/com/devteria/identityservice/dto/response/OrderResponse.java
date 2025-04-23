@@ -1,12 +1,13 @@
 package com.devteria.identityservice.dto.response;
 
-import com.devteria.identityservice.status.OrderStatus;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
+
+import com.devteria.identityservice.status.OrderStatus;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @NoArgsConstructor
