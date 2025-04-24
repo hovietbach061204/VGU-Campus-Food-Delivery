@@ -15,7 +15,7 @@ public interface FoodItemMapper {
     @Mapping(target = "name", source = "name")
     @Mapping(target = "description", source = "description")
     @Mapping(target = "price", source = "price")
-//    @Mapping(target = "quantity", source = "quantity") // Map quantity
+    //    @Mapping(target = "quantity", source = "quantity") // Map quantity
     FoodItemOrderResponse toFoodItemOrderResponse(FoodItem foodItem);
 
     FoodItemMenuResponse toFoodItemMenuResponse(FoodItem foodItem);

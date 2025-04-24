@@ -1,10 +1,10 @@
 package com.devteria.identityservice.mapper;
 
-import com.devteria.identityservice.dto.response.RoleOrderResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.devteria.identityservice.dto.request.RoleRequest;
+import com.devteria.identityservice.dto.response.RoleOrderResponse;
 import com.devteria.identityservice.dto.response.RoleResponse;
 import com.devteria.identityservice.entity.Role;
 
@@ -14,5 +14,6 @@ public interface RoleMapper {
     Role toRole(RoleRequest request);
 
     RoleOrderResponse toRoleOrderResponse(Role role);
+
     RoleResponse toRoleResponse(Role role);
 }

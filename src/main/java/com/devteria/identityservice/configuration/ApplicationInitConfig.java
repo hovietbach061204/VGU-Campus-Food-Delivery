@@ -5,8 +5,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.devteria.identityservice.entity.*;
-import com.devteria.identityservice.repository.*;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.devteria.identityservice.constant.PredefinedRole;
+import com.devteria.identityservice.entity.*;
+import com.devteria.identityservice.repository.*;
 import com.devteria.identityservice.status.Status;
 
 import lombok.AccessLevel;
@@ -47,7 +47,12 @@ public class ApplicationInitConfig {
             prefix = "spring",
             value = "datasource.driverClassName",
             havingValue = "com.mysql.cj.jdbc.Driver")
-    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository, EateryRepository eateryRepository, FoodItemRepository foodItemRepository, PermissionRepository permissionRepository) {
+    ApplicationRunner applicationRunner(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            EateryRepository eateryRepository,
+            FoodItemRepository foodItemRepository,
+            PermissionRepository permissionRepository) {
         log.info("Initializing application.....");
         return args -> {
             // Create admin user logic (already present)
@@ -103,11 +108,8 @@ public class ApplicationInitConfig {
 
                 deliveryManRole.setPermissions(Set.of(accept_order));
 
-
-
                 var roles = Set.of(purchaserRole, deliveryManRole, adminRole);
                 roles.forEach(roleRepository::save);
-
 
                 var adminRoles = new HashSet<Role>();
                 adminRoles.add(adminRole);
@@ -213,7 +215,9 @@ public class ApplicationInitConfig {
                         .build();
 
                 // Save FoodItems to the database
-                foodItemRepository.saveAll(Set.of(pho, bun_cha, banh_cuon, banh_mi, xoi, sinh_to, bun_ca, cafe_sua, tra_sua, hu_tieu, com_ga, rau_ma));
+                foodItemRepository.saveAll(Set.of(
+                        pho, bun_cha, banh_cuon, banh_mi, xoi, sinh_to, bun_ca, cafe_sua, tra_sua, hu_tieu, com_ga,
+                        rau_ma));
 
                 Eatery abo = Eatery.builder()
                         .name("ABO")

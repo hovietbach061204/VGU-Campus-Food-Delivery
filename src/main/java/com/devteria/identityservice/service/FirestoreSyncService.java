@@ -1,10 +1,12 @@
 package com.devteria.identityservice.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.devteria.identityservice.entity.FoodItem;
 import com.devteria.identityservice.entity.Order;
 import com.devteria.identityservice.entity.User;
 import com.google.cloud.Timestamp;
@@ -29,6 +31,14 @@ public class FirestoreSyncService {
             data.put("status", getStatus(order));
             data.put("total_price", order.getTotalPrice());
             data.put("created_at", Timestamp.now());
+
+            List<String> foodItemNames =
+                    order.getFoodItems().stream().map(FoodItem::getName).toList();
+            data.put("foodItems", foodItemNames);
+
+            if (order.getEatery() != null) {
+                data.put("eateryName", order.getEatery().getName());
+            }
 
             db.collection(COLLECTION_NAME).document(order.getOrderId()).set(data);
             System.out.println("✅ Order created in Firestore: " + order.getOrderId());

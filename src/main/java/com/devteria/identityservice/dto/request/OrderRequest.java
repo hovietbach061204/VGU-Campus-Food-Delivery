@@ -18,5 +18,4 @@ public class OrderRequest {
     String eateryName;
     Set<FoodItemOrderRequest> foodItems;
     String purchaserId;
-    // String deliverymanId;
 }

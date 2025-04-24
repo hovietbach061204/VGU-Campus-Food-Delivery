@@ -6,14 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.devteria.identityservice.dto.response.FoodItemOrderResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devteria.identityservice.dto.request.FoodItemOrderRequest;
 import com.devteria.identityservice.dto.request.OrderRequest;
+import com.devteria.identityservice.dto.response.FoodItemOrderResponse;
 import com.devteria.identityservice.dto.response.OrderResponse;
-import com.devteria.identityservice.entity.FoodItem;
 import com.devteria.identityservice.mapper.OrderMapper;
 import com.devteria.identityservice.repository.*;
 import com.devteria.identityservice.status.OrderStatus;
@@ -39,32 +38,47 @@ public class OrderService {
     @Transactional
     public OrderResponse createOrder(OrderRequest request) {
         try {
+            if (request == null) {
+                throw new IllegalArgumentException("OrderRequest must not be null");
+            }
+            if (request.getPurchaserId() == null) {
+                throw new IllegalArgumentException("Purchaser ID is required");
+            }
+            if (request.getFoodItems() == null || request.getFoodItems().isEmpty()) {
+                throw new IllegalArgumentException("At least one food item is required");
+            }
+
             var order = orderMapper.toOrder(request);
             order.setOrderStatus(OrderStatus.PENDING);
 
-            var foodItemIds = request.getFoodItems().stream().map(FoodItemOrderRequest::getName).toList();
+            var foodItemIds = request.getFoodItems().stream()
+                    .map(FoodItemOrderRequest::getName)
+                    .toList();
             var foodItems = foodItemRepository.findAllById(foodItemIds);
             order.setFoodItems(new HashSet<>(foodItems));
             order.setCreatedAt(LocalDate.now());
 
             AtomicReference<BigDecimal> totalPrice = new AtomicReference<>(BigDecimal.ZERO);
-            var foodItemResponses = foodItems.stream().map(foodItem -> {
-                int quantity = request.getFoodItems().stream()
-                        .filter(f -> f.getName().equals(foodItem.getName()))
-                        .findFirst()
-                        .map(FoodItemOrderRequest::getQuantity)
-                        .orElse(0);
+            var foodItemResponses = foodItems.stream()
+                    .map(foodItem -> {
+                        int quantity = request.getFoodItems().stream()
+                                .filter(f -> f.getName().equals(foodItem.getName()))
+                                .findFirst()
+                                .map(FoodItemOrderRequest::getQuantity)
+                                .orElse(0);
 
-                totalPrice.set(totalPrice.get().add(foodItem.getPrice().multiply(BigDecimal.valueOf(quantity))));
+                        totalPrice.set(
+                                totalPrice.get().add(foodItem.getPrice().multiply(BigDecimal.valueOf(quantity))));
 
-                // Map FoodItem to FoodItemOrderResponse and set quantity dynamically
-                return FoodItemOrderResponse.builder()
-                        .name(foodItem.getName())
-                        .description(foodItem.getDescription())
-                        .price(foodItem.getPrice())
-                        .quantity(quantity) // Set quantity dynamically
-                        .build();
-            }).toList();
+                        // Map FoodItem to FoodItemOrderResponse and set quantity dynamically
+                        return FoodItemOrderResponse.builder()
+                                .name(foodItem.getName())
+                                .description(foodItem.getDescription())
+                                .price(foodItem.getPrice())
+                                .quantity(quantity)
+                                .build();
+                    })
+                    .toList();
 
             order.setTotalPrice(totalPrice.get());
 
@@ -72,8 +86,14 @@ public class OrderService {
                 throw new RuntimeException("Some food items were not found");
             }
 
-            var discounts = discountRepository.findAllById(request.getVoucherCode());
-            order.setDiscounts(new HashSet<>(discounts));
+            if (request.getVoucherCode() != null && !request.getVoucherCode().isEmpty()) {
+                var discounts = discountRepository.findAllById(request.getVoucherCode());
+                if (discounts.size() != request.getVoucherCode().size()) {
+                    throw new RuntimeException("Some voucher codes are invalid");
+                }
+
+                order.setDiscounts(new HashSet<>(discounts));
+            }
 
             var eatery = eateryRepository
                     .findById(request.getEateryName())
