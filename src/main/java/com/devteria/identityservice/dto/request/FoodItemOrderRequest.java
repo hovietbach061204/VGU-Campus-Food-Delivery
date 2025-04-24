@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FoodItemOrderRequest {
-    String id;
+    String name;
     int quantity;
 
     @Override
@@ -17,11 +17,11 @@ public class FoodItemOrderRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FoodItemOrderRequest that = (FoodItemOrderRequest) o;
-        return id.equals(that.id);
+        return name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return name.hashCode();
     }
 }
