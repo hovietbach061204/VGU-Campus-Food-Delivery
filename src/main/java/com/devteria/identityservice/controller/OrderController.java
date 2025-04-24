@@ -58,6 +58,13 @@ public class OrderController {
                 .build();
     }
 
+    @GetMapping("/pending/{purchaserId}")
+    ApiResponse<List<OrderResponse>> getPendingOrdersByPurchaser(@PathVariable String purchaserId) {
+        return ApiResponse.<List<OrderResponse>>builder()
+                .result(orderService.getPendingOrdersByPurchaser(purchaserId))
+                .build();
+    }
+
     @DeleteMapping("/{orderId}")
     ApiResponse<Void> delete(@PathVariable String orderId) {
         orderService.deleteOrder(orderId);

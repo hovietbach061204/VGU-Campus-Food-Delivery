@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import com.devteria.identityservice.dto.request.FoodItemOrderRequest;
 import com.devteria.identityservice.dto.request.OrderRequest;
 import com.devteria.identityservice.dto.response.FoodItemOrderResponse;
 import com.devteria.identityservice.dto.response.OrderResponse;
+import com.devteria.identityservice.entity.Discount;
 import com.devteria.identityservice.mapper.OrderMapper;
 import com.devteria.identityservice.repository.*;
 import com.devteria.identityservice.status.OrderStatus;
@@ -55,6 +57,16 @@ public class OrderService {
                     .map(FoodItemOrderRequest::getName)
                     .toList();
             var foodItems = foodItemRepository.findAllById(foodItemIds);
+            Set<Discount> discounts = new HashSet<>();
+            if (request.getVoucherCode() != null && !request.getVoucherCode().isEmpty()) {
+                var foundDiscounts = discountRepository.findAllById(request.getVoucherCode());
+                if (foundDiscounts.size() != request.getVoucherCode().size()) {
+                    throw new RuntimeException("Some voucher codes are invalid");
+                }
+                discounts.addAll(foundDiscounts);
+            }
+            order.setDiscounts(discounts);
+
             order.setFoodItems(new HashSet<>(foodItems));
             order.setCreatedAt(LocalDate.now());
 
@@ -80,19 +92,17 @@ public class OrderService {
                     })
                     .toList();
 
+            int totalDiscountPercentage =
+                    discounts.stream().mapToInt(Discount::getDiscountPercentage).sum();
+
+            // Apply discount to total price
+            BigDecimal discountMultiplier = BigDecimal.valueOf(1 - (totalDiscountPercentage / 100.0));
+            totalPrice.set(totalPrice.get().multiply(discountMultiplier));
+
             order.setTotalPrice(totalPrice.get());
 
             if (foodItems.size() != foodItemIds.size()) {
                 throw new RuntimeException("Some food items were not found");
-            }
-
-            if (request.getVoucherCode() != null && !request.getVoucherCode().isEmpty()) {
-                var discounts = discountRepository.findAllById(request.getVoucherCode());
-                if (discounts.size() != request.getVoucherCode().size()) {
-                    throw new RuntimeException("Some voucher codes are invalid");
-                }
-
-                order.setDiscounts(new HashSet<>(discounts));
             }
 
             var eatery = eateryRepository
@@ -117,6 +127,12 @@ public class OrderService {
             log.error("❌ Order creation failed: {}", e.getMessage(), e);
             throw new RuntimeException("Order creation failed", e);
         }
+    }
+
+    public List<OrderResponse> getPendingOrdersByPurchaser(String purchaserId) {
+        return orderRepository.findByOrderStatusAndPurchaserId(OrderStatus.PENDING, purchaserId).stream()
+                .map(orderMapper::toOrderResponse)
+                .toList();
     }
 
     public OrderResponse getOrder(String orderId) {
