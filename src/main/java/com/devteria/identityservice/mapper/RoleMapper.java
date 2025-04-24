@@ -1,5 +1,6 @@
 package com.devteria.identityservice.mapper;
 
+import com.devteria.identityservice.dto.response.RoleOrderResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,5 +13,6 @@ public interface RoleMapper {
     @Mapping(target = "permissions", ignore = true)
     Role toRole(RoleRequest request);
 
+    RoleOrderResponse toRoleOrderResponse(Role role);
     RoleResponse toRoleResponse(Role role);
 }

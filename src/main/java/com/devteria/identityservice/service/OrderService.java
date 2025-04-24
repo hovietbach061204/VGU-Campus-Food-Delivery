@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.devteria.identityservice.dto.response.FoodItemOrderResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,32 +42,38 @@ public class OrderService {
             var order = orderMapper.toOrder(request);
             order.setOrderStatus(OrderStatus.PENDING);
 
-            var foodItemIds = request.getFoodItems().stream()
-                    .map(FoodItemOrderRequest::getId)
-                    .toList();
-
+            var foodItemIds = request.getFoodItems().stream().map(FoodItemOrderRequest::getName).toList();
             var foodItems = foodItemRepository.findAllById(foodItemIds);
             order.setFoodItems(new HashSet<>(foodItems));
-
             order.setCreatedAt(LocalDate.now());
 
-            BigDecimal totalPrice = BigDecimal.ZERO;
-            for (FoodItem foodItem : foodItems) {
+            AtomicReference<BigDecimal> totalPrice = new AtomicReference<>(BigDecimal.ZERO);
+            var foodItemResponses = foodItems.stream().map(foodItem -> {
                 int quantity = request.getFoodItems().stream()
-                        .filter(f -> f.getId().equals(foodItem.getFoodItemId())) // or name
+                        .filter(f -> f.getName().equals(foodItem.getName()))
                         .findFirst()
                         .map(FoodItemOrderRequest::getQuantity)
                         .orElse(0);
-                totalPrice = totalPrice.add(foodItem.getPrice().multiply(BigDecimal.valueOf(quantity)));
+
+                totalPrice.set(totalPrice.get().add(foodItem.getPrice().multiply(BigDecimal.valueOf(quantity))));
+
+                // Map FoodItem to FoodItemOrderResponse and set quantity dynamically
+                return FoodItemOrderResponse.builder()
+                        .name(foodItem.getName())
+                        .description(foodItem.getDescription())
+                        .price(foodItem.getPrice())
+                        .quantity(quantity) // Set quantity dynamically
+                        .build();
+            }).toList();
+
+            order.setTotalPrice(totalPrice.get());
+
+            if (foodItems.size() != foodItemIds.size()) {
+                throw new RuntimeException("Some food items were not found");
             }
-            order.setTotalPrice(totalPrice);
 
-            // if (foodItems.size() != foodItemIds.size()) {
-            //     throw new RuntimeException("Some food items were not found");
-            // }
-
-            // var discounts = discountRepository.findAllById(request.getVoucherCode());
-            // order.setDiscounts(new HashSet<>(discounts));
+            var discounts = discountRepository.findAllById(request.getVoucherCode());
+            order.setDiscounts(new HashSet<>(discounts));
 
             var eatery = eateryRepository
                     .findById(request.getEateryName())
@@ -80,7 +88,11 @@ public class OrderService {
             order = orderRepository.save(order);
             System.out.println("🔥 Firestore method called for: " + order.getOrderId());
             firestoreSyncService.createOrderInFirestore(order);
-            return orderMapper.toOrderResponse(order);
+
+            // Build the response dynamically
+            var response = orderMapper.toOrderResponse(order);
+            response.setFoodItemResponses(new HashSet<>(foodItemResponses)); // Convert to Set
+            return response;
         } catch (Exception e) {
             log.error("❌ Order creation failed: {}", e.getMessage(), e);
             throw new RuntimeException("Order creation failed", e);

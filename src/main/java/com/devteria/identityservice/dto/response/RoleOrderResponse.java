@@ -1,5 +1,4 @@
 package com.devteria.identityservice.dto.response;
-
 import java.util.Set;
 
 import lombok.*;
@@ -10,8 +9,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserOrderResponse {
-    String id;
-    String username;
-    Set<RoleOrderResponse> roles;
+public class RoleOrderResponse {
+    String name;
 }
