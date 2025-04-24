@@ -6,7 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.devteria.identityservice.dto.request.DiscountRequest;
 import com.devteria.identityservice.dto.response.FoodItemOrderResponse;
+import com.devteria.identityservice.entity.Discount;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +47,9 @@ public class OrderService {
 
             var foodItemIds = request.getFoodItems().stream().map(FoodItemOrderRequest::getName).toList();
             var foodItems = foodItemRepository.findAllById(foodItemIds);
+            var discounts = discountRepository.findAllById(request.getVoucherCode());
+            order.setDiscounts(new HashSet<>(discounts));
+
             order.setFoodItems(new HashSet<>(foodItems));
             order.setCreatedAt(LocalDate.now());
 
@@ -66,14 +72,19 @@ public class OrderService {
                         .build();
             }).toList();
 
+            int totalDiscountPercentage = discounts.stream()
+                    .mapToInt(Discount::getDiscountPercentage)
+                    .sum();
+
+            // Apply discount to total price
+            BigDecimal discountMultiplier = BigDecimal.valueOf(1 - (totalDiscountPercentage / 100.0));
+            totalPrice.set(totalPrice.get().multiply(discountMultiplier));
+
             order.setTotalPrice(totalPrice.get());
 
             if (foodItems.size() != foodItemIds.size()) {
                 throw new RuntimeException("Some food items were not found");
             }
-
-            var discounts = discountRepository.findAllById(request.getVoucherCode());
-            order.setDiscounts(new HashSet<>(discounts));
 
             var eatery = eateryRepository
                     .findById(request.getEateryName())
@@ -97,6 +108,13 @@ public class OrderService {
             log.error("❌ Order creation failed: {}", e.getMessage(), e);
             throw new RuntimeException("Order creation failed", e);
         }
+    }
+
+    public List<OrderResponse> getPendingOrdersByPurchaser(String purchaserId) {
+        return orderRepository.findByOrderStatusAndPurchaserId(OrderStatus.PENDING, purchaserId)
+                .stream()
+                .map(orderMapper::toOrderResponse)
+                .toList();
     }
 
     public OrderResponse getOrder(String orderId) {
