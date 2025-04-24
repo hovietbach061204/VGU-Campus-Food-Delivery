@@ -37,6 +37,12 @@ public class User {
     @ManyToMany
     Set<Role> roles;
 
+    @OneToMany(mappedBy = "purchaser", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Order> purchasedOrders;
+
+    @OneToMany(mappedBy = "deliveryman", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Order> deliveredOrders;
+
     //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     //    Set<Order> orders;
 

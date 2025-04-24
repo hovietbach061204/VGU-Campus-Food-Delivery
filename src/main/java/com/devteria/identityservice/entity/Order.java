@@ -24,13 +24,18 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     String orderId;
 
-    //    @GeneratedValue(strategy = GenerationType.UUID)
-    //    String purchaserId;
-    //
-    //    @GeneratedValue(strategy = GenerationType.UUID)
-    //    String deliverymanId;
+    @ManyToOne
+    @JoinColumn(name = "purchaser_id", referencedColumnName = "id", nullable = false)
+    User purchaser;
 
-    OrderStatus orderStatus;
+    @ManyToOne
+    @JoinColumn(name = "deliveryman_id", referencedColumnName = "id", nullable = true)
+    User deliveryman;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false)
+    @Builder.Default
+    OrderStatus orderStatus = OrderStatus.PENDING;
 
     @Column(name = "totalPrice", precision = 10, scale = 2)
     BigDecimal totalPrice;

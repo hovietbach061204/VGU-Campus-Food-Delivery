@@ -1,17 +1,20 @@
 package com.devteria.identityservice.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.devteria.identityservice.dto.request.FoodItemOrderRequest;
 import com.devteria.identityservice.dto.request.OrderRequest;
 import com.devteria.identityservice.dto.response.OrderResponse;
+import com.devteria.identityservice.entity.FoodItem;
 import com.devteria.identityservice.mapper.OrderMapper;
-import com.devteria.identityservice.repository.DiscountRepository;
-import com.devteria.identityservice.repository.EateryRepository;
-import com.devteria.identityservice.repository.FoodItemRepository;
-import com.devteria.identityservice.repository.OrderRepository;
+import com.devteria.identityservice.repository.*;
+import com.devteria.identityservice.status.OrderStatus;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,25 +31,60 @@ public class OrderService {
     final FoodItemRepository foodItemRepository;
     final DiscountRepository discountRepository;
     final EateryRepository eateryRepository;
+    private final FirestoreSyncService firestoreSyncService;
+    final UserRepository userRepository;
 
+    @Transactional
     public OrderResponse createOrder(OrderRequest request) {
-        var order = orderMapper.toOrder(request);
+        try {
+            var order = orderMapper.toOrder(request);
+            order.setOrderStatus(OrderStatus.PENDING);
 
-        var foodItems = foodItemRepository.findAllById(request.getFoodItems());
-        order.setFoodItems(new HashSet<>(foodItems));
+            var foodItemIds = request.getFoodItems().stream()
+                    .map(FoodItemOrderRequest::getId)
+                    .toList();
 
-        if (request.getVoucherCode() != null && !request.getVoucherCode().isEmpty()) {
-            var discounts = discountRepository.findAllById(request.getVoucherCode());
-            order.setDiscounts(new HashSet<>(discounts));
+            var foodItems = foodItemRepository.findAllById(foodItemIds);
+            order.setFoodItems(new HashSet<>(foodItems));
+
+            order.setCreatedAt(LocalDate.now());
+
+            BigDecimal totalPrice = BigDecimal.ZERO;
+            for (FoodItem foodItem : foodItems) {
+                int quantity = request.getFoodItems().stream()
+                        .filter(f -> f.getId().equals(foodItem.getFoodItemId())) // or name
+                        .findFirst()
+                        .map(FoodItemOrderRequest::getQuantity)
+                        .orElse(0);
+                totalPrice = totalPrice.add(foodItem.getPrice().multiply(BigDecimal.valueOf(quantity)));
+            }
+            order.setTotalPrice(totalPrice);
+
+            // if (foodItems.size() != foodItemIds.size()) {
+            //     throw new RuntimeException("Some food items were not found");
+            // }
+
+            // var discounts = discountRepository.findAllById(request.getVoucherCode());
+            // order.setDiscounts(new HashSet<>(discounts));
+
+            var eatery = eateryRepository
+                    .findById(request.getEateryName())
+                    .orElseThrow(() -> new RuntimeException("Eatery not found"));
+            order.setEatery(eatery);
+
+            var purchaser = userRepository
+                    .findById(request.getPurchaserId())
+                    .orElseThrow(() -> new RuntimeException("Purchaser not found"));
+            order.setPurchaser(purchaser);
+
+            order = orderRepository.save(order);
+            System.out.println("🔥 Firestore method called for: " + order.getOrderId());
+            firestoreSyncService.createOrderInFirestore(order);
+            return orderMapper.toOrderResponse(order);
+        } catch (Exception e) {
+            log.error("❌ Order creation failed: {}", e.getMessage(), e);
+            throw new RuntimeException("Order creation failed", e);
         }
-
-        var eatery = eateryRepository
-                .findById(request.getEateryName())
-                .orElseThrow(() -> new RuntimeException("Eatery not found"));
-        order.setEatery(eatery);
-
-        order = orderRepository.save(order);
-        return orderMapper.toOrderResponse(order);
     }
 
     public OrderResponse getOrder(String orderId) {

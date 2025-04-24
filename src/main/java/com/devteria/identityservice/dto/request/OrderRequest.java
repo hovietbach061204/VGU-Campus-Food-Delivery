@@ -1,6 +1,5 @@
 package com.devteria.identityservice.dto.request;
 
-import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -17,7 +16,7 @@ import lombok.experimental.FieldDefaults;
 public class OrderRequest {
     Set<String> voucherCode;
     String eateryName;
-    List<String> foodItems;
+    Set<FoodItemOrderRequest> foodItems;
     String purchaserId;
     // String deliverymanId;
 }

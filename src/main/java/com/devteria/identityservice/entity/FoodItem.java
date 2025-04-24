@@ -15,10 +15,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 public class FoodItem {
-    //    @Id
-    //    @GeneratedValue(strategy = GenerationType.UUID)
-    //    String foodItemId;
+
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String foodItemId;
+
     String name;
 
     String description;
@@ -28,6 +29,4 @@ public class FoodItem {
 
     @Column(name = "imageUrl")
     String imageUrl;
-
-    int quantity;
 }

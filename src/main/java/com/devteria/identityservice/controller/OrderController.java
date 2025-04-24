@@ -1,13 +1,16 @@
 package com.devteria.identityservice.controller;
 
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.devteria.identityservice.dto.request.ApiResponse;
 import com.devteria.identityservice.dto.request.OrderRequest;
 import com.devteria.identityservice.dto.response.OrderResponse;
+import com.devteria.identityservice.service.OrderMatchingService;
 import com.devteria.identityservice.service.OrderService;
 
 import lombok.AccessLevel;
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderController {
     final OrderService orderService;
+    final OrderMatchingService orderMatchingService;
 
     @PostMapping
     ApiResponse<OrderResponse> createOrder(@RequestBody OrderRequest request) {
@@ -31,16 +35,12 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/accept")
-    public ResponseEntity<?> acceptOrder(
-        @PathVariable Integer orderId,
-        @RequestParam Integer driverId
-    ) {
+    public ResponseEntity<?> acceptOrder(@PathVariable String orderId, @RequestParam String driverId) {
         boolean accepted = orderMatchingService.acceptOrder(driverId, orderId);
         if (accepted) {
             return ResponseEntity.ok(Map.of("status", "ACCEPTED"));
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("status", "ALREADY_ASSIGNED"));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("status", "ALREADY_ASSIGNED"));
         }
     }
 
