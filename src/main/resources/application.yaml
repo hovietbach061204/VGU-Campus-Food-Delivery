@@ -14,7 +14,19 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  application:
+    name: deliver-tracking
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .html
+
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
   valid-duration: 3600 # in second
   refreshable-duration: 36000 # in seconds
+
+
+graphhopper:
+  api:
+    key: 3cde815c-380c-4820-b820-1e6ce3017080

@@ -3,6 +3,7 @@ package com.devteria.identityservice.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.devteria.identityservice.status.OrderStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +45,16 @@ public class OrderController {
         }
     }
 
+    @PostMapping("/{orderId}/updateOrderStatus")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable String orderId, @RequestParam String driverId, @RequestParam OrderStatus newStatus){
+        boolean updated = orderMatchingService.updateOrderStatus(driverId, orderId, newStatus);
+        if(updated){
+            return ResponseEntity.ok(Map.of("status", "UPDATED"));
+        }else{
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("status", "UPDATE_FAILED"));
+        }
+    }
+
     @GetMapping
     ApiResponse<List<OrderResponse>> getAllOrders() {
         return ApiResponse.<List<OrderResponse>>builder()
@@ -58,10 +69,17 @@ public class OrderController {
                 .build();
     }
 
-    @GetMapping("/pending/{purchaserId}")
-    ApiResponse<List<OrderResponse>> getPendingOrdersByPurchaser(@PathVariable String purchaserId) {
+//    @GetMapping("/pending/{purchaserId}")
+//    ApiResponse<List<OrderResponse>> getsByPurchaserAndStatus(@PathVariable String purchaserId) {
+//        return ApiResponse.<List<OrderResponse>>builder()
+//                .result(orderService.getPendingOrdersByPurchaser(purchaserId))
+//                .build();
+//    }
+
+    @GetMapping("/{purchaserId}/{status}")
+    ApiResponse<List<OrderResponse>> getsByPurchaserAndStatus(@PathVariable String purchaserId, @PathVariable OrderStatus status) {
         return ApiResponse.<List<OrderResponse>>builder()
-                .result(orderService.getPendingOrdersByPurchaser(purchaserId))
+                .result(orderService.getsByPurchaserAndStatus(purchaserId, status))
                 .build();
     }
 

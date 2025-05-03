@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-Time Delivery Tracking</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+
+<h2>Driver Tracking Map</h2>
+<div id="map" style="height: 500px;"></div>
+
+<script>
+    var map = L.map('map').setView([10.762622, 106.660172], 13); // Default location (Ho Chi Minh City)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    var driverMarkers = {};
+
+    async function fetchDriverLocations() {
+        const response = await fetch('/api/location/get');
+        const locations = await response.json();
+
+        for (let driverId in locations) {
+            const [lat, lon] = locations[driverId];
+
+            if (driverMarkers[driverId]) {
+                driverMarkers[driverId].setLatLng([lat, lon]);
+            } else {
+                driverMarkers[driverId] = L.marker([lat, lon]).addTo(map)
+                    .bindPopup(`Driver ${driverId}`);
+            }
+        }
+    }
+
+    setInterval(fetchDriverLocations, 3000); // Fetch every 3 seconds
+</script>
+
+</body>
+</html>

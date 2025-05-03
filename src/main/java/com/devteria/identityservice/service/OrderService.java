@@ -10,6 +10,8 @@ import com.devteria.identityservice.dto.request.DiscountRequest;
 import com.devteria.identityservice.dto.response.FoodItemOrderResponse;
 import com.devteria.identityservice.entity.Discount;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +42,7 @@ public class OrderService {
     final UserRepository userRepository;
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public OrderResponse createOrder(OrderRequest request) {
         try {
             var order = orderMapper.toOrder(request);
@@ -110,13 +113,15 @@ public class OrderService {
         }
     }
 
-    public List<OrderResponse> getPendingOrdersByPurchaser(String purchaserId) {
-        return orderRepository.findByOrderStatusAndPurchaserId(OrderStatus.PENDING, purchaserId)
-                .stream()
-                .map(orderMapper::toOrderResponse)
-                .toList();
-    }
+//    @Transactional
+//    public List<OrderResponse> getPendingOrdersByPurchaser(String purchaserId) {
+//        return orderRepository.findByOrderStatusAndPurchaserId(OrderStatus.PENDING, purchaserId)
+//                .stream()
+//                .map(orderMapper::toOrderResponse)
+//                .toList();
+//    }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public OrderResponse getOrder(String orderId) {
         return orderRepository
                 .findById(orderId)
@@ -124,13 +129,24 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<OrderResponse> getAllOrders() {
         return orderRepository.findAll().stream()
                 .map(orderMapper::toOrderResponse)
                 .toList();
     }
 
+    @Transactional
+    public List<OrderResponse> getsByPurchaserAndStatus(String purchaserId,OrderStatus status) {
+        return orderRepository.findByOrderStatusAndPurchaserId(status, purchaserId)
+                .stream()
+                .map(orderMapper::toOrderResponse)
+                .toList();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteOrder(String orderId) {
         orderRepository.deleteById(orderId);
     }
+
 }

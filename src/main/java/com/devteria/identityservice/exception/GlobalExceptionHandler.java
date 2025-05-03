@@ -3,8 +3,10 @@ package com.devteria.identityservice.exception;
 import java.util.Map;
 import java.util.Objects;
 
+import com.devteria.identityservice.status.OrderStatus;
 import jakarta.validation.ConstraintViolation;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.devteria.identityservice.dto.request.ApiResponse;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
 @Slf4j
@@ -89,5 +92,15 @@ public class GlobalExceptionHandler {
         String minValue = String.valueOf(attributes.get(MIN_ATTRIBUTE));
 
         return message.replace("{" + MIN_ATTRIBUTE + "}", minValue);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleInvalidEnumValue(MethodArgumentTypeMismatchException ex) {
+        if (ex.getRequiredType() == OrderStatus.class) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Invalid value for OrderStatus"));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "Invalid input: " + ex.getMessage()));
     }
 }

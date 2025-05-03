@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Route Estimation</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    #map { height: 500px; }
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .results { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Real-Time Route Tracking</h2>
+  <div id="map"></div>
+  <div class="results" id="results">
+    <p>Tracking route between deliveryman and purchaser...</p>
+  </div>
+</div>
+
+<script>
+  var map = L.map('map').setView([10.762622, 106.660172], 13);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  var deliverymanMarker = null;
+  var purchaserMarker = null;
+  var routeLine = null;
+
+  async function fetchLocationsAndRoute() {
+    try {
+      // Fetch deliveryman and purchaser locations
+      const deliverymanResponse = await fetch('/api/location/get/123');
+      const purchaserResponse = await fetch('/api/location/get/345');
+      const deliverymanLocation = await deliverymanResponse.json();
+      const purchaserLocation = await purchaserResponse.json();
+
+      const [deliverymanLat, deliverymanLon] = deliverymanLocation;
+      const [purchaserLat, purchaserLon] = purchaserLocation;
+
+      // Update markers
+      if (deliverymanMarker) map.removeLayer(deliverymanMarker);
+      if (purchaserMarker) map.removeLayer(purchaserMarker);
+
+      deliverymanMarker = L.marker([deliverymanLat, deliverymanLon]).addTo(map).bindPopup("Deliveryman");
+      purchaserMarker = L.marker([purchaserLat, purchaserLon]).addTo(map).bindPopup("Purchaser");
+
+      map.fitBounds([
+        [deliverymanLat, deliverymanLon],
+        [purchaserLat, purchaserLon]
+      ]);
+
+      // Fetch route
+      const routeResponse = await fetch(`/api/routing/estimate?startLat=${deliverymanLat}&startLon=${deliverymanLon}&endLat=${purchaserLat}&endLon=${purchaserLon}`);
+      const routeData = await routeResponse.json();
+
+      // Display route information
+      document.getElementById('results').innerHTML = `
+        <h3>Route Information:</h3>
+        <p><strong>Distance:</strong> ${routeData.distanceKm.toFixed(2)} km</p>
+        <p><strong>Estimated Time:</strong> ${routeData.timeMinutes.toFixed(2)} minutes</p>
+      `;
+
+      // Draw the route
+      if (routeLine) map.removeLayer(routeLine);
+      const geojson = JSON.parse(routeData.routeGeometry);
+      const coords = geojson.coordinates.map(coord => [coord[1], coord[0]]);
+      routeLine = L.polyline(coords, { color: 'blue', weight: 5 }).addTo(map);
+    } catch (error) {
+      console.error('Error fetching locations or route:', error);
+    }
+  }
+
+  // Fetch locations and route every 5 seconds
+  setInterval(fetchLocationsAndRoute, 5000);
+</script>
+</body>
+</html>
