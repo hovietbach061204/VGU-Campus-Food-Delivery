@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/routing")
+@CrossOrigin(origins = "http://localhost:3000")
 public class RoutingController {
 
     private final LocationService locationService;
@@ -21,7 +22,7 @@ public class RoutingController {
             @RequestParam double startLon,
             @RequestParam double endLat,
             @RequestParam double endLon) {
-
+                
         return locationService.estimateTravelTime(startLat, startLon, endLat, endLon);
     }
 }
