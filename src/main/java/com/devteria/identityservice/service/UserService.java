@@ -40,6 +40,9 @@ public class UserService {
 
     public UserResponse createUser(UserCreationRequest request) {
         User user = userMapper.toUser(request);
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setDob(request.getDob());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setStatus(Status.OFFLINE);
         HashSet<Role> roles = new HashSet<>();
@@ -72,8 +75,8 @@ public class UserService {
         userMapper.updateUser(user, request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        var roles = roleRepository.findAllById(request.getRoles());
-        user.setRoles(new HashSet<>(roles));
+        // var roles = roleRepository.findAllById(request.getRoles());
+        // user.setRoles(new HashSet<>(roles));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
@@ -89,7 +92,7 @@ public class UserService {
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     public UserResponse getUser(String id) {
         return userMapper.toUserResponse(
                 userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
