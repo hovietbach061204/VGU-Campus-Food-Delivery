@@ -17,5 +17,8 @@ public class OrderRequest {
     Set<String> voucherCode;
     String eateryName;
     Set<FoodItemOrderRequest> foodItems;
-    String purchaserId;
+    UserOrderRequest purchaser;
+    //    String purchaserId;
+    //    Double purchaserLat;
+    //    Double purchaserLon;
 }

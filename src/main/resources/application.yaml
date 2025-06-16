@@ -5,16 +5,39 @@ server:
 
 spring:
   datasource:
-    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/identity_service}
+    url: ${DBMS_CONNECTION}
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    password: ${DBMS_PASSWORD:root}
-    username: ${DBMS_USERNAME:root}
+    username: ${DBMS_USERNAME}
+    password: ${DBMS_PASSWORD}
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 
+  application:
+    name: deliver-tracking
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .html
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: email, profile
+            redirect-uri: "http://localhost:3000/authenticate"
+            client-name: Google
+
 jwt:
-  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
-  valid-duration: 3600 # in second
+  signerKey: ${JWT_SIGNER_KEY}
+  valid-duration: 3600 # in seconds
   refreshable-duration: 36000 # in seconds
+
+graphhopper:
+  api:
+    key: ${GRAPHHOPPER_API_KEY}

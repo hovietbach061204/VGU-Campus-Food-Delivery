@@ -24,7 +24,7 @@ public class OrderMatchingService {
     private final FirestoreSyncService firestoreSyncService;
 
     @Transactional
-    public boolean acceptOrder(String driverId, String orderId) {
+    public boolean acceptOrder(String driverId, String orderId, Double deliveryManLat, Double deliveryManLon) {
         try {
             Optional<Order> optionalOrder = orderRepository.findByIdForUpdate(orderId);
             if (optionalOrder.isEmpty()) {
@@ -47,12 +47,13 @@ public class OrderMatchingService {
             order.setUpdatedAt(LocalDate.now());
 
             orderRepository.save(order);
-            firestoreSyncService.updateOrderInFirestore(order);
+
+            // Pass deliveryManLat and deliveryManLon to Firestore
+            firestoreSyncService.updateOrderInFirestore(order, deliveryManLat, deliveryManLon);
 
             return true;
 
         } catch (Exception e) {
-            // Log the exception and return false to indicate failure
             System.err.println("Failed to accept order: " + e.getMessage());
             e.printStackTrace();
             return false;

@@ -22,15 +22,27 @@ import org.springframework.web.filter.CorsFilter;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-        "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
+        "/users",
+        "/auth/token",
+        "/auth/introspect",
+        "/auth/logout",
+        "/auth/refresh",
+        "/auth/outbound/authentication",
+        "/api/routing/estimate"
     };
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
 
+    @Autowired
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+
         httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/routing/estimate")
                 .permitAll()
                 .anyRequest()
                 .authenticated());
@@ -40,6 +52,9 @@ public class SecurityConfig {
                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
+
+        // Inject custom success handler
+        httpSecurity.oauth2Login(oauth2 -> oauth2.successHandler(oAuth2LoginSuccessHandler));
 
         return httpSecurity.build();
     }

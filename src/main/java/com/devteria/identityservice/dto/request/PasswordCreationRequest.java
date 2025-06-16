@@ -1,5 +1,7 @@
 package com.devteria.identityservice.dto.request;
 
+import jakarta.validation.constraints.Size;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,8 +10,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EateryRequest {
-    String name;
-    String location;
-    String contactNumber;
+public class PasswordCreationRequest {
+    @Size(min = 6, message = "INVALID_PASSWORD")
+    String password;
 }

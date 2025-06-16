@@ -2,6 +2,7 @@ package com.devteria.identityservice.dto.request;
 
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import com.devteria.identityservice.validator.DobConstraint;
@@ -26,4 +27,7 @@ public class UserCreationRequest {
 
     @DobConstraint(min = 10, message = "INVALID_DOB")
     LocalDate dob;
+
+    @NotBlank(message = "PHONE_NUMBER_REQUIRED")
+    String phoneNumber;
 }

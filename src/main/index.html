@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Tracking Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <style>
+        #map { height: 90vh; width: 100%; }
+        body { margin: 0; padding: 0; }
+        .controls { margin: 10px; }
+        select, input { margin-right: 10px; }
+    </style>
+</head>
+<body>
+<h2>Order Tracking</h2>
+<div class="controls">
+    <select id="purchaserSelect"></select>
+    <select id="foodItemSelect"></select>
+    <select id="deliverymanSelect"></select>
+    <button id="createOrderBtn">Create Order (Purchaser)</button>
+    <button id="acceptOrderBtn">Accept Order (Deliveryman)</button>
+    <input type="text" id="orderIdInput" placeholder="Order ID" />
+</div>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+<script>
+    let map, routingControl;
+    let purchaserMarker = null, deliverymanMarker = null;
+    let startLat, startLon, endLat, endLon;
+
+    // Fetch users and food items from backend and populate dropdowns
+    async function populateDropdowns() {
+        // Replace these URLs with your actual backend endpoints
+        const purchasers = await fetch('/api/users?role=purchaser').then(r => r.json()).catch(() => []);
+        const deliverymen = await fetch('/api/users?role=deliveryman').then(r => r.json()).catch(() => []);
+        const foodItems = await fetch('/api/food-items').then(r => r.json()).catch(() => []);
+
+        const purchaserSelect = document.getElementById('purchaserSelect');
+        const deliverymanSelect = document.getElementById('deliverymanSelect');
+        const foodItemSelect = document.getElementById('foodItemSelect');
+
+        purchaserSelect.innerHTML = purchasers.map(u =>
+            `<option value="${u.id}">${u.name || u.id}</option>`
+        ).join('');
+        deliverymanSelect.innerHTML = deliverymen.map(u =>
+            `<option value="${u.id}">${u.name || u.id}</option>`
+        ).join('');
+        foodItemSelect.innerHTML = foodItems.map(f =>
+            `<option value="${f.name}">${f.name}</option>`
+        ).join('');
+    }
+
+    function initMap() {
+        map = L.map('map').setView([0, 0], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+    }
+
+    function setMarker(lat, lon, markerRef, entity) {
+        const popupContent = `
+            <b>${entity}</b><br>
+            Lat: ${lat.toFixed(6)}<br>
+            Lon: ${lon.toFixed(6)}
+        `;
+        if (markerRef && map.hasLayer(markerRef)) {
+            markerRef.setLatLng([lat, lon]).setPopupContent(popupContent);
+        } else {
+            markerRef = L.marker([lat, lon]).addTo(map).bindPopup(popupContent);
+            markerRef.on('mouseover', function() { this.openPopup(); });
+            markerRef.on('mouseout', function() { this.closePopup(); });
+        }
+        return markerRef;
+    }
+
+    function updateRoute() {
+        if (routingControl) {
+            map.removeControl(routingControl);
+        }
+        if (startLat && startLon && endLat && endLon) {
+            routingControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(startLat, startLon),
+                    L.latLng(endLat, endLon)
+                ],
+                routeWhileDragging: false
+            }).addTo(map);
+
+            const group = new L.featureGroup([purchaserMarker, deliverymanMarker]);
+            map.fitBounds(group.getBounds().pad(0.5));
+        }
+    }
+
+    function getUserLocationAndCreateOrder() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    startLat = position.coords.latitude;
+                    startLon = position.coords.longitude;
+                    createOrder(startLat, startLon);
+                },
+                () => alert('Could not get your location.')
+            );
+        } else {
+            alert('Geolocation is not supported by this browser.');
+        }
+    }
+
+    function createOrder(lat, lon) {
+        const purchaserId = document.getElementById('purchaserSelect').value;
+        const foodItemId = document.getElementById('foodItemSelect').value;
+        const orderRequest = {
+            purchaserId: purchaserId,
+            eateryName: "ABO",
+            foodItems: [{ name: foodItemId, quantity: 1 }],
+            purchaserLat: lat,
+            purchaserLon: lon
+        };
+        fetch('http://localhost:8080/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderRequest)
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert('Order created! Order ID: ' + data.result.orderId);
+            document.getElementById('orderIdInput').value = data.result.orderId;
+            purchaserMarker = setMarker(lat, lon, purchaserMarker, "Purchaser");
+            map.setView([lat, lon], 13);
+        })
+        .catch(() => alert('Failed to create order.'));
+    }
+
+    function getDeliverymanLocationAndAcceptOrder() {
+        const orderId = document.getElementById('orderIdInput').value;
+        if (!orderId) {
+            alert('Please enter Order ID.');
+            return;
+        }
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    acceptOrder(orderId, position.coords.latitude, position.coords.longitude);
+                },
+                () => alert('Could not get your location.')
+            );
+        } else {
+            alert('Geolocation is not supported by this browser.');
+        }
+    }
+
+    function acceptOrder(orderId, lat, lon) {
+        const deliverymanId = document.getElementById('deliverymanSelect').value;
+        const params = new URLSearchParams({
+            driverId: deliverymanId,
+            deliveryManLat: lat,
+            deliveryManLon: lon
+        });
+        fetch(`http://localhost:8080/orders/${orderId}/accept?${params.toString()}`, {
+            method: 'POST'
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "ACCEPTED") {
+                alert('Order accepted!');
+                endLat = lat;
+                endLon = lon;
+                deliverymanMarker = setMarker(lat, lon, deliverymanMarker, "Deliveryman");
+                if (startLat && startLon) {
+                    updateRoute();
+                }
+            } else {
+                alert('Failed to accept order: ' + data.status);
+            }
+        })
+        .catch(() => alert('Failed to accept order.'));
+    }
+
+    function fetchDeliveryManLocation(orderId) {
+        fetch(`http://localhost:8080/identity/api/deliveryman/location/firestore?orderId=${orderId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.lat && data.lon) {
+                    endLat = data.lat;
+                    endLon = data.lon;
+                    deliverymanMarker = setMarker(endLat, endLon, deliverymanMarker, "Deliveryman");
+                    if (startLat && startLon) {
+                        updateRoute();
+                    }
+                } else {
+                    alert('Could not fetch deliveryman location.');
+                }
+            })
+            .catch(() => alert('Error fetching deliveryman location.'));
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        await populateDropdowns();
+        initMap();
+
+        document.getElementById('createOrderBtn').onclick = getUserLocationAndCreateOrder;
+        document.getElementById('acceptOrderBtn').onclick = getDeliverymanLocationAndAcceptOrder;
+
+        document.getElementById('orderIdInput').addEventListener('change', function() {
+            const orderId = this.value;
+            if (orderId) {
+                fetchDeliveryManLocation(orderId);
+            }
+        });
+    });
+</script>
+</body>
+</html>

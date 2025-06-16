@@ -16,7 +16,14 @@ public enum ErrorCode {
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
-    ;
+    EATERY_NOT_FOUND(1009, "Eatery does not exist", HttpStatus.BAD_REQUEST),
+    FOOD_ITEM_NOT_FOUND(1010, "Food item does not exist", HttpStatus.BAD_REQUEST),
+    FOOD_ITEM_ALREADY_EXISTS(1011, "Food item has already existed in the selected eatery", HttpStatus.BAD_REQUEST),
+    EATER_EXISTED(1012, "Eatery existed", HttpStatus.BAD_REQUEST),
+    PASSWORD_EXISTED(1013, "Password existed", HttpStatus.BAD_REQUEST),
+    PASSWORD_INCORRECT(1014, "The password is incorrect", HttpStatus.BAD_REQUEST),
+    INVALID_ORDER_STATUS(1015, "Invalid order status transition", HttpStatus.BAD_REQUEST),
+    ORDER_NOT_FOUND(1016, "Order not found", HttpStatus.NOT_FOUND);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

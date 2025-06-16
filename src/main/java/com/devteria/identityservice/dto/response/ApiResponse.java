@@ -1,4 +1,4 @@
-package com.devteria.identityservice.dto.request;
+package com.devteria.identityservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

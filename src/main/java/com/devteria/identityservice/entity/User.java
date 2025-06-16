@@ -31,10 +31,12 @@ public class User {
     LocalDate dob;
     String lastName;
 
+    String phoneNumber;
+
     @Enumerated(EnumType.STRING)
     Status status;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     Set<Role> roles;
 
     @OneToMany(mappedBy = "purchaser", cascade = CascadeType.ALL, orphanRemoval = true)

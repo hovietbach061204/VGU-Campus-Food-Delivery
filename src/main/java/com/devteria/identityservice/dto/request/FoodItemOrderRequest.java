@@ -1,5 +1,9 @@
 package com.devteria.identityservice.dto.request;
 
+import java.util.Objects;
+
+import com.devteria.identityservice.size.Size;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,17 +15,19 @@ import lombok.experimental.FieldDefaults;
 public class FoodItemOrderRequest {
     String name;
     int quantity;
+    String description;
+    Size size;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FoodItemOrderRequest that = (FoodItemOrderRequest) o;
-        return name.equals(that.name);
+        return Objects.equals(name, that.name) && size == that.size; // Important: compare Size too
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(name, size); // Combine name + size
     }
 }

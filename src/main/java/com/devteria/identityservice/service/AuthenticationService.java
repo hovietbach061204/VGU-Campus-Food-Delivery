@@ -3,9 +3,7 @@ package com.devteria.identityservice.service;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,18 +11,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.devteria.identityservice.dto.request.AuthenticationRequest;
-import com.devteria.identityservice.dto.request.IntrospectRequest;
-import com.devteria.identityservice.dto.request.LogoutRequest;
-import com.devteria.identityservice.dto.request.RefreshRequest;
+import com.devteria.identityservice.constant.PredefinedRole;
+import com.devteria.identityservice.dto.request.*;
 import com.devteria.identityservice.dto.response.AuthenticationResponse;
 import com.devteria.identityservice.dto.response.IntrospectResponse;
 import com.devteria.identityservice.entity.InvalidatedToken;
+import com.devteria.identityservice.entity.Role;
 import com.devteria.identityservice.entity.User;
 import com.devteria.identityservice.exception.AppException;
 import com.devteria.identityservice.exception.ErrorCode;
 import com.devteria.identityservice.repository.InvalidatedTokenRepository;
+import com.devteria.identityservice.repository.RoleRepository;
 import com.devteria.identityservice.repository.UserRepository;
+import com.devteria.identityservice.repository.httpclient.OutboundIdentityClient;
+import com.devteria.identityservice.repository.httpclient.OutboundUserClient;
+import com.devteria.identityservice.status.Status;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -44,6 +45,9 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationService {
     UserRepository userRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
+    OutboundIdentityClient outboundIdentityClient;
+    OutboundUserClient outboundUserClient;
+    RoleRepository roleRepository;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -57,6 +61,21 @@ public class AuthenticationService {
     @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
 
+    @NonFinal
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    protected String CLIENT_ID;
+
+    @NonFinal
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    protected String CLIENT_SECRET;
+
+    @NonFinal
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    protected String REDIRECT_URI;
+
+    @NonFinal
+    protected final String GRANT_TYPE = "authorization_code";
+
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
         boolean isValid = true;
@@ -68,6 +87,42 @@ public class AuthenticationService {
         }
 
         return IntrospectResponse.builder().valid(isValid).build();
+    }
+
+    public AuthenticationResponse outboundAuthenticate(String code) {
+        var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
+                .code(code)
+                .clientId(CLIENT_ID)
+                .clientSecret(CLIENT_SECRET)
+                .redirectUri(REDIRECT_URI)
+                .grantType(GRANT_TYPE)
+                .build());
+
+        log.info("TOKEN RESPONSE {}", response);
+
+        // Get user info
+        var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
+
+        log.info("User Info {}", userInfo);
+
+        HashSet<Role> roles = new HashSet<>();
+        roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
+
+        // Onboarding user
+
+        var user = userRepository
+                .findByUsername(userInfo.getName())
+                .orElseGet(() -> userRepository.save(User.builder()
+                        .username(userInfo.getName())
+                        .firstName(userInfo.getGivenName())
+                        .lastName(userInfo.getFamilyName())
+                        .roles(roles)
+                        .status(Status.OFFLINE)
+                        .build()));
+
+        var token = generateToken(user);
+
+        return AuthenticationResponse.builder().token(token).authenticated(true).build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {

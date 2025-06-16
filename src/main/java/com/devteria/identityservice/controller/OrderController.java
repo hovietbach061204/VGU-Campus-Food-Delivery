@@ -7,10 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.devteria.identityservice.dto.request.ApiResponse;
 import com.devteria.identityservice.dto.request.OrderRequest;
+import com.devteria.identityservice.dto.response.ApiResponse;
 import com.devteria.identityservice.dto.response.OrderResponse;
-import com.devteria.identityservice.service.OrderMatchingService;
 import com.devteria.identityservice.service.OrderService;
 
 import lombok.AccessLevel;
@@ -25,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderController {
     final OrderService orderService;
-    final OrderMatchingService orderMatchingService;
 
     @PostMapping
     ApiResponse<OrderResponse> createOrder(@RequestBody OrderRequest request) {
@@ -35,8 +33,12 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/accept")
-    public ResponseEntity<?> acceptOrder(@PathVariable String orderId, @RequestParam String driverId) {
-        boolean accepted = orderMatchingService.acceptOrder(driverId, orderId);
+    public ResponseEntity<?> acceptOrder(
+            @PathVariable String orderId,
+            @RequestParam String driverId,
+            @RequestParam Double deliveryManLat,
+            @RequestParam Double deliveryManLon) {
+        boolean accepted = orderService.acceptOrder(driverId, orderId, deliveryManLat, deliveryManLon);
         if (accepted) {
             return ResponseEntity.ok(Map.of("status", "ACCEPTED"));
         } else {
@@ -66,8 +68,34 @@ public class OrderController {
     }
 
     @DeleteMapping("/{orderId}")
-    ApiResponse<Void> delete(@PathVariable String orderId) {
+    ApiResponse<Map<String, String>> delete(@PathVariable String orderId) {
         orderService.deleteOrder(orderId);
-        return ApiResponse.<Void>builder().build();
+
+        return ApiResponse.<Map<String, String>>builder()
+                .result(Map.of("message", "Order " + orderId + " successfully cancelled"))
+                .build();
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    ApiResponse<Map<String, String>> cancelOrder(@PathVariable String orderId) {
+        orderService.cancelOrder(orderId);
+
+        return ApiResponse.<Map<String, String>>builder()
+                .result(Map.of("status", "CANCELLED", "message", "Order " + orderId + " successfully cancelled"))
+                .build();
+    }
+
+    @PutMapping("/{orderId}/status")
+    public ApiResponse<OrderResponse> updateOrderStatus(@PathVariable String orderId) {
+        return ApiResponse.<OrderResponse>builder()
+                .result(orderService.updateOrderStatus(orderId))
+                .build();
+    }
+
+    @PutMapping("/{orderId}/status/pending")
+    public ApiResponse<OrderResponse> revertOrderStatusToPending(@PathVariable String orderId) {
+        return ApiResponse.<OrderResponse>builder()
+                .result(orderService.revertOrderStatusToPending(orderId))
+                .build();
     }
 }

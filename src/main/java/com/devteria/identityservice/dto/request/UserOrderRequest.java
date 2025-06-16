@@ -8,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EateryRequest {
-    String name;
-    String location;
-    String contactNumber;
+public class UserOrderRequest {
+    String purchaserId;
+    Double purchaserLat;
+    Double purchaserLon;
 }

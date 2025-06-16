@@ -10,9 +10,10 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
-import com.devteria.identityservice.dto.request.ApiResponse;
+import com.devteria.identityservice.dto.request.PasswordCreationRequest;
 import com.devteria.identityservice.dto.request.UserCreationRequest;
 import com.devteria.identityservice.dto.request.UserUpdateRequest;
+import com.devteria.identityservice.dto.response.ApiResponse;
 import com.devteria.identityservice.dto.response.UserResponse;
 import com.devteria.identityservice.entity.User;
 import com.devteria.identityservice.service.UserService;
@@ -34,6 +35,15 @@ public class UserController {
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.createUser(request))
+                .build();
+    }
+
+    @PostMapping("/create-password")
+    ApiResponse<Void> createPassword(@RequestBody @Valid PasswordCreationRequest request) {
+        userService.createPassword(request);
+
+        return ApiResponse.<Void>builder()
+                .message("Password has been created, you could use it to log-in")
                 .build();
     }
 
@@ -65,7 +75,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    ApiResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+    ApiResponse<UserResponse> updateUser(@PathVariable String userId, @Valid @RequestBody UserUpdateRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.updateUser(userId, request))
                 .build();

@@ -14,4 +14,6 @@ public class UserOrderResponse {
     String id;
     String username;
     Set<RoleOrderResponse> roles;
+    Double purchaserLat;
+    Double purchaserLon;
 }

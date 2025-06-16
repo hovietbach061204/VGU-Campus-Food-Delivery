@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.devteria.identityservice.dto.request.ApiResponse;
 import com.devteria.identityservice.dto.request.DiscountRequest;
+import com.devteria.identityservice.dto.response.ApiResponse;
 import com.devteria.identityservice.dto.response.DiscountResponse;
 import com.devteria.identityservice.service.DiscountService;
 
