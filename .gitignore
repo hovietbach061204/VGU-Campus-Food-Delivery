@@ -1,5 +1,5 @@
 .env
-application-secrets.yaml
+application-local.yaml
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
