@@ -36,7 +36,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     Status status;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_name"))
     Set<Role> roles;
 
     @OneToMany(mappedBy = "purchaser", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -45,14 +49,15 @@ public class User {
     @OneToMany(mappedBy = "deliveryman", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<Order> deliveredOrders;
 
-    //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    //    Set<Order> orders;
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval =
+    // true)
+    // Set<Order> orders;
 
-    //    @OneToMany(mappedBy = "user")
-    //    Set<Notification> notifications;
+    // @OneToMany(mappedBy = "user")
+    // Set<Notification> notifications;
 
-    //    @OneToMany(mappedBy = "user")
-    //    Set<ChatRoom> chatboxes;
-    //    @OneToOne(mappedBy = "user")
-    //    Message message;
+    // @OneToMany(mappedBy = "user")
+    // Set<ChatRoom> chatboxes;
+    // @OneToOne(mappedBy = "user")
+    // Message message;
 }

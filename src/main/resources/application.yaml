@@ -29,14 +29,15 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            scope: email, profile
-            redirect-uri: "http://localhost:3000/authenticate"
-            client-name: Google
 
+            scope: email, profile
+            redirect-uri: "http://localhost:8080/identity/login/oauth2/code/google"
+            client-name: Google
 jwt:
   signerKey: ${JWT_SIGNER_KEY}
-  valid-duration: 3600 # in seconds
+  valid-duration: 3600 # in second
   refreshable-duration: 36000 # in seconds
+
 
 graphhopper:
   api:

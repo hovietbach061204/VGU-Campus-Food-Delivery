@@ -2,6 +2,7 @@ package com.devteria.identityservice.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -62,6 +63,47 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
+    public User loadOrCreateUser(String email, String givenName, String familyName) {
+        System.out.println("Attempting to load or create user with email: " + email);
+
+        return userRepository.findByUsername(email).orElseGet(() -> {
+            System.out.println("User not found. Proceeding to create new user.");
+
+            Set<Role> roles = new HashSet<>();
+            roleRepository
+                    .findById(PredefinedRole.USER_ROLE)
+                    .ifPresentOrElse(
+                            roles::add,
+                            () -> System.out.println("WARNING: USER role not found in DB. User will have no roles."));
+
+            User newUser = User.builder()
+                    .username(email)
+                    .firstName(givenName)
+                    .lastName(familyName)
+                    .status(Status.ONLINE)
+                    .roles(roles)
+                    .build();
+
+            System.out.println("Creating new user: " + newUser);
+
+            try {
+                User savedUser = userRepository.save(newUser);
+                System.out.println("User created successfully with ID: " + savedUser.getId());
+                return savedUser;
+            } catch (Exception ex) {
+                System.out.println("ERROR: Failed to save new user. Exception: " + ex.getMessage());
+                ex.printStackTrace();
+                throw ex;
+            }
+        });
+    }
+
+    public User loadUserWithRolesAndPermissions(String email) {
+        return userRepository
+                .findWithRolesAndPermissionsByUsername(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    }
+
     public void createPassword(PasswordCreationRequest request) {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
@@ -81,7 +123,7 @@ public class UserService {
         var userResponse = userMapper.toUserResponse(user);
         userResponse.setNoPassword(!StringUtils.hasText(user.getPassword()));
 
-        //        return userMapper.toUserResponse(user);
+        // return userMapper.toUserResponse(user);
         return userResponse;
     }
 

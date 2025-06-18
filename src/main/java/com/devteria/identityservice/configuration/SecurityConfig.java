@@ -3,6 +3,7 @@ package com.devteria.identityservice.configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,6 +36,7 @@ public class SecurityConfig {
     private CustomJwtDecoder customJwtDecoder;
 
     @Autowired
+    @Lazy
     private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
